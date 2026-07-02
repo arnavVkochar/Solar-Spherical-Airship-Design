@@ -1,0 +1,770 @@
+function [f0, res] = run_airship_analysis(x, params)
+    %import math
+    optim_modules_path = params.optim_modules_path;
+    py.sys.path().insert(int32(0), optim_modules_path);
+    
+    
+    ranges   = params.ranges;
+    payload_weight = params.payload_weight;
+    payload_length = params.payload_length;
+    payload_width = params.payload_width;
+    payload_height = params.payload_height;
+    cruise_altitude_m = params.cruise_altitude_m;
+    envelope_thickness = params.envelope_thickness;
+    envelope_mass_per_m2 = params.envelope_mass_per_m2;
+
+    solar_area_per_panel = params.solar_area_per_panel;
+    battery_length = params.battery_length;
+    battery_width = params.battery_width;
+    battery_height = params.battery_height;
+    solar_panel_weight_per_panel = params.solar_panel_weight_per_panel;
+    energy_per_battery = params.energy_per_battery;
+    battery_weight_per_unit_volume = params.battery_weight_per_unit_volume;
+    payload_d_factor = params.payload_d_factor;
+    
+    
+    
+    start_year = params.start_year;
+    start_month = params.start_month;
+    start_date = params.start_date;
+    start_hour = params.start_hour;
+    start_minute = params.start_minute;
+    gas_density_sl = params.gas_density;
+    ballonet_thickness = params.ballonet_thickness;
+    ballonet_mass_per_m2 = params.ballonet_mass_per_m2;
+    load_patch_thickness = params.load_patch_thickness;
+    struc_material_density = params.load_patch_weight_per_volume;
+
+
+
+
+    envelope_radius = ranges(1,1) + x(1)*(ranges(1,2)-ranges(1,1));
+    %solar_panel_area = ranges(2,1) + x(2)*(ranges(2,2)-ranges(2,1));
+    num_panels = ranges(2,1) + x(2)*(ranges(2,2)-ranges(2,1));
+    solar_panel_area = num_panels*solar_area_per_panel;
+
+    num_battery = ranges(3,1) + x(3)*(ranges(3,2)-ranges(3,1));
+    prop_radius_h = ranges(4,1) + x(4)*(ranges(4,2)-ranges(4,1));
+    prop_radius_v = 1;
+    strut_radius_h = 0.05;
+    strut_radius_v = 0.05;
+    J_h = ranges(5,1) + x(5)*(ranges(5,2)-ranges(5,1));
+    J_v = 0.5;
+    hub_to_tip_ratio_h = ranges(6,1) + x(6)*(ranges(6,2)-ranges(6,1));
+    hub_to_tip_ratio_v = 0.2;
+    %blade_count_h = round(ranges(7,1) + x(7)*(ranges(7,2)-ranges(7,1)));
+    blade_count_h = 3;
+    blade_count_v = 5;
+    thrust_h = ranges(8,1) + x(8)*(ranges(8,2)-ranges(8,1));
+    thrust_v = 0;
+    design_airspeed = ranges(9,1) + ...
+        x(9)*(ranges(9,2)-ranges(9,1));
+    ballonet_volume_fraction_sl = ranges(10,1) + ...
+        x(10)*(ranges(10,2)-ranges(10,1));
+
+
+
+
+    % envelope_radius     = ranges(1,1) + x(1)*(ranges(1,2) - ranges(1,1));
+    % solar_panel_area     = ranges(2,1) + x(2)*(ranges(2,2) - ranges(2,1));
+    % num_battery     = ranges(3,1) + x(3)*(ranges(3,2) - ranges(3,1));
+    % prop_radius_h = ranges(4,1) + x(4)*(ranges(4,2) - ranges(4,1));
+    % %prop_radius_v = ranges(5,1) + x(5)*(ranges(5,2) - ranges(5,1));
+    % prop_radius_v = 1;
+    % %strut_radius_h = ranges(6,1) + x(6)*(ranges(6,2) - ranges(6,1));
+    % strut_radius_h = 0.05;
+    % strut_radius_v = 0.05;
+    % %strut_radius_v = ranges(7,1) + x(7)*(ranges(7,2) - ranges(7,1));
+    % J_h = ranges(8,1) + x(8)*(ranges(8,2) - ranges(8,1));
+    % %J_v = ranges(9,1) + x(9)*(ranges(9,2) - ranges(9,1));
+    % J_v = 0.5;
+    % hub_to_tip_ratio_h = ranges(10,1) + x(10)*(ranges(10,2) - ranges(10,1));
+    % %hub_to_tip_ratio_v = ranges(11,1) + x(11)*(ranges(11,2) - ranges(11,1));
+    % hub_to_tip_ratio_v = 0.2;
+    % blade_count_h = round(ranges(12,1) + x(12)*(ranges(12,2) - ranges(12,1)));
+    % %blade_count_v = round(ranges(13,1) + x(13)*(ranges(13,2) - ranges(13,1)));
+    % blade_count_v = 5;
+    % thrust_h = ranges(14,1) + x(14)*(ranges(14,2) - ranges(14,1));
+    % %thrust_v = ranges(15,1) + x(15)*(ranges(15,2) - ranges(15,1));
+    % thrust_v = 0;
+    % design_airspeed = ranges(16,1) + x(16)*(ranges(16,2) - ranges(16,1));
+    % ballonet_volume_fraction_sl = ranges(17,1) + x(17)*(ranges(17,2) - ranges(17,1));
+
+    spinner_dia_h = hub_to_tip_ratio_h*(prop_radius_h*2);
+    spinner_dia_v = hub_to_tip_ratio_v*(prop_radius_v*2);
+    
+    fprintf('\n--------------------------------------------------------\n');
+    fprintf('\n--- Design Variables ---\n');
+    fprintf('envelope_radius  = %.4f\n', envelope_radius);
+    fprintf('total_solar_panel_area  = %.4fm2\n', solar_panel_area);
+    fprintf('num_battery = %.0f\n', ceil(num_battery));
+    fprintf('prop_radius_h  = %.4f\n', prop_radius_h);
+    fprintf('strut_radius_h  = %.4f\n', strut_radius_h);
+    fprintf('prop_radius_v  = %.4f\n', prop_radius_v);
+    fprintf('strut_radius_v  = %.4f\n', strut_radius_v);
+    fprintf('J_h  = %.4f\n', J_h);
+    fprintf('J_v  = %.4f\n', J_v);
+    fprintf('hub_to_tip_ratio_h  = %.4f\n', hub_to_tip_ratio_h);
+    fprintf('hub_to_tip_ratio_v  = %.4f\n', hub_to_tip_ratio_v);
+    fprintf('blade_count_h  = %.4f\n', blade_count_h);
+    fprintf('blade_count_v  = %.4f\n', blade_count_v);
+    fprintf('thrust_h  = %.4f\n', thrust_h);
+    fprintf('thrust_v  = %.4f\n', thrust_v);
+    fprintf('ballonet_volume_fraction_sl  = %.4f\n\n', ballonet_volume_fraction_sl);
+    
+
+
+    if py.importlib.util.find_spec('airship_trajectory') ~= py.None
+        airship_trajectory = py.importlib.import_module('airship_trajectory');
+        py.importlib.reload(airship_trajectory);
+    else
+        airship_trajectory = py.importlib.import_module('airship_trajectory');
+    end
+    
+    timestep_s = 1200;
+    motor_eta = 0.9;
+
+
+    ceiling_tolerance_m = 500;
+    solar_panel_eta = 0.33;
+    solar_timestep_s = timestep_s/2;
+    
+    %weight_per_propulsor = 5;%kg
+    weight_per_battery =  battery_weight_per_unit_volume*(battery_length*battery_width*battery_height);
+    weight_per_load_patch = 0;
+    weight_prop_struts = 0;
+
+    num_load_patches = 6;
+
+    %energy_per_battery = 120000;
+    loiter_coef = 0.8;
+    penalty = 0;
+
+
+    air_density_kg_m3        = 0.5895;    % kg/m^3
+    kinematic_viscosity_m2_s = 2.60e-5;   % m^2/s
+    speed_of_sound_m_s       = 312.2;     % m/s
+
+    Diameter_h = 2 * prop_radius_h;
+    Diameter_v = 2 * prop_radius_v;
+
+    rpm_h = (design_airspeed / (J_h * Diameter_h)) * 60;
+    rpm_v = (design_airspeed / (J_v * Diameter_v)) * 60;
+    
+    warning('off','all');   
+    evalc('PropDesign = DesignProp_updated(prop_radius_h*2, design_airspeed, rpm_h, thrust_h, spinner_dia_h, blade_count_h, air_density_kg_m3, kinematic_viscosity_m2_s, speed_of_sound_m_s);');
+    warning('on','all');   
+    
+    %Generateproptables(PropDesign, prop_radius_h*2,air_density_kg_m3, kinematic_viscosity_m2_s, speed_of_sound_m_s);
+    
+    res.PropDesign = PropDesign;
+    res.air_density_kg_m3 = air_density_kg_m3;
+    res.kinematic_viscosity_m2_s = kinematic_viscosity_m2_s;
+    res.speed_of_sound_m_s = speed_of_sound_m_s;
+
+    res.horizontal_prop_eta = PropDesign.Eta;
+
+    Prop_Weight_Module = py.importlib.import_module('propeller_weight');
+    py.importlib.reload(Prop_Weight_Module);
+    
+    py_pw_input = py.dict(pyargs( ...
+        'excel_path', params.blade_data_path, ...
+        'prop_radius_m',  prop_radius_h,             ...
+        'blade_count',    blade_count_h,             ...
+        'hub_to_tip',     hub_to_tip_ratio_h         ...
+    ));
+    
+    py_pw_output = Prop_Weight_Module.run_model(py_pw_input);
+    weight_propulsors_h = double(py_pw_output{'total_assembly_weight_kg'}); %kg
+    
+    
+    if py.importlib.util.find_spec('ground_speed') ~= py.None
+        Ground_Speed_Module = py.importlib.import_module('ground_speed');
+        py.importlib.reload(Ground_Speed_Module);
+    else
+        Ground_Speed_Module = py.importlib.import_module('ground_speed');
+    end
+
+    py_output = Ground_Speed_Module.run_model(py.dict());
+
+    
+    total_distance_m   = double(py_output{'total_distance_m'});
+    total_distance_km  = double(py_output{'total_distance_km'});
+    ground_speed    = double(py_output{'ground_speed_ms'});
+    ground_speed_kmh   = double(py_output{'ground_speed_kmh'});
+    num_waypoints      = double(py_output{'num_waypoints'});
+
+    %fprintf('Ground Speed =  %.4f m/s\n', ground_speed);
+
+    py_input = py.dict(pyargs( ...
+        'excel_path',        params.mission_plan_path, ...
+        'sheet_name',        'Waypoints',                    ...  
+        'avg_speed_ms',      ground_speed,                           ...  
+        'start_year',        start_year,                           ...  
+        'start_month',       start_month,                              ...
+        'start_day',         start_date,                              ...
+        'start_hour',        start_hour,                              ...
+        'start_minute',      start_minute,                              ...
+        'timestep_minutes',  timestep_s/60                               ... 
+    ));
+    
+    py_output = airship_trajectory.run_model(py_input);
+    
+   
+    n_points = int32(py_output{'n_points'});
+    
+    
+    latitudes   = double(py_output{'latitudes'});    
+    longitudes  = double(py_output{'longitudes'});   
+    elapsed_s   = double(py_output{'elapsed_s'});    
+    dist_m      = double(py_output{'dist_m'});       
+    leg_indices = double(py_output{'leg_indices'});  
+    
+
+ 
+    total_distance_km  = double(py_output{'total_distance_km'});
+    total_duration_min = double(py_output{'total_duration_min'});
+    n_waypoints        = int32(py_output{'n_waypoints'});
+    n_legs             = int32(py_output{'n_legs'});
+    
+
+    n = double(n_points);
+    
+    traj_matrix = [(0:n-1)', ...          
+                   latitudes(:),   ...          
+                   longitudes(:),  ...          
+                   elapsed_s(:),   ...          
+                   dist_m(:),      ...          
+                   leg_indices(:)];            
+
+    col_names = {'idx', 'lat', 'lon', 'elapsed_s', 'dist_m', 'leg'};
+    
+
+    elapsed_min = traj_matrix(:, 4) / 60;
+    traj_matrix_ext = [traj_matrix, elapsed_min]; 
+    
+    %disp(col_names)
+    %disp(traj_matrix);
+    
+    %disp(traj_matrix_ext(1,1));
+    
+    sz = size(traj_matrix_ext);
+    
+    rows_sz = size(traj_matrix_ext, 1);
+    cols_sz = size(traj_matrix_ext, 2);
+    
+    %disp(rows_sz)
+    %disp(cols_sz)
+    
+    
+
+    %battery_capacity = 0;
+    battery_capacity = loiter_coef *num_battery*energy_per_battery;
+    battery_capacity_max = 0;
+    Energy_balance = battery_capacity; %has to be 0 or positive in the end. -> constraint put it in res
+    counter = 0;
+    %fprintf('Starting loop. \n\n\n');
+    
+
+    RPM_res         = zeros((rows_sz-1), 1);
+    Eta_res         = zeros((rows_sz-1), 1);
+    PowerShaft_res  = zeros((rows_sz-1), 1);
+    PowerUseful_res = zeros((rows_sz-1), 1);
+
+    
+
+
+    for i = 1:(rows_sz-1)
+        fprintf('---------------------------------------------------------------\n')
+        fprintf('Iteration i = %d\n', i);
+    
+        start_lat = traj_matrix_ext(i,2);
+        end_lat   = traj_matrix_ext(i+1,2);
+    
+        start_lon = traj_matrix_ext(i,3);
+        end_lon   = traj_matrix_ext(i+1,3);
+    
+        timestep = traj_matrix_ext(i+1,4) - traj_matrix_ext(i,4);
+       
+    
+        total_time_elapsed_s = traj_matrix_ext(i,4);
+        fprintf('total time elapsed: %.3f s\n', total_time_elapsed_s);
+    
+    
+        
+        if py.importlib.util.find_spec('Time_Elapsed_Module') ~= py.None
+            Time_Elapsed_Module = py.importlib.import_module('Time_Elapsed_Module');
+            py.importlib.reload(Time_Elapsed_Module);
+        else
+            Time_Elapsed_Module = py.importlib.import_module('Time_Elapsed_Module');
+        end
+    
+        py_input = py.dict(pyargs( ...
+            'start_year',          start_year,   ...  
+            'start_month',         start_month,      ... 
+            'start_day',           start_date,     ... 
+            'start_hour',          start_hour,      ...  
+            'start_minute',        start_minute,     ...  
+            'elapsed_seconds',     total_time_elapsed_s   ...  
+        ));
+    
+        py_output = Time_Elapsed_Module.run_model(py_input);
+    
+        % Extract outputs
+        new_year   = double(py_output{'new_year'});
+        new_month  = double(py_output{'new_month'});
+        new_day    = double(py_output{'new_day'});
+        new_hour   = double(py_output{'new_hour'});
+        new_minute = double(py_output{'new_minute'});
+        new_datetime_str = string(py_output{'new_datetime_str'}); 
+        elapsed_minutes  = double(py_output{'elapsed_minutes'});
+    
+        fprintf('Arrival time: %s\n', new_datetime_str);
+    
+    
+    
+    
+    
+        dist_m = traj_matrix_ext(i+1,5) - traj_matrix_ext(i,5);
+        fprintf('Distance travelled in this section: %.3f m\n', dist_m);
+    
+        heading = azimuth(start_lat, start_lon, end_lat, end_lon);
+        fprintf('Heading/Azimuth: %.3f deg\n', heading);
+        
+        if py.importlib.util.find_spec('wind_data') ~= py.None
+            Wind_Module = py.importlib.import_module('wind_data');
+            py.importlib.reload(Wind_Module);
+        else
+            Wind_Module = py.importlib.import_module('wind_data');
+        end
+    
+        py_wind_input = py.dict(pyargs( ...
+            'latitude',  start_lat, ...   
+            'longitude', start_lon  ...   
+        ));
+    
+        py_wind_output = Wind_Module.run_model(py_wind_input);
+    
+        
+        wind_speed_mps     = double(py_wind_output{'wind_speed_mps'});      
+        wind_direction_deg = double(py_wind_output{'wind_direction_deg'});
+        
+        fprintf('Wind speed: %.3f m/s\n', wind_speed_mps);
+        fprintf('Wind direction: %.3f deg\n', wind_direction_deg);
+    
+        
+    
+        if py.importlib.util.find_spec('Wind_Vector_Module') ~= py.None
+            Wind_Vector_Module = py.importlib.import_module('Wind_Vector_Module');
+            py.importlib.reload(Wind_Vector_Module);
+        else
+            Wind_Vector_Module = py.importlib.import_module('Wind_Vector_Module');
+        end
+    
+        py_input = py.dict(pyargs( ...
+            'wind_speed',     wind_speed_mps,     ...  
+            'wind_direction', wind_direction_deg, ...   
+            'ground_speed',   ground_speed,   ...   
+            'heading',        heading         ...   
+        ));
+        py_output = Wind_Vector_Module.run_model(py_input);
+        Va_N = double(py_output{'Va_N'});
+        Va_E= double(py_output{'Va_E'});
+        airspeed = double(py_output{'airspeed'});  
+        fprintf('Airspeed: %.3f m/s\n', airspeed);
+    
+      
+        if py.importlib.util.find_spec('envelope_drag') ~= py.None
+            Envelope_Drag_Module = py.importlib.import_module('envelope_drag');
+            py.importlib.reload(Envelope_Drag_Module);
+        else
+            Envelope_Drag_Module = py.importlib.import_module('envelope_drag');
+        end
+        
+        py_input = py.dict(pyargs( ...
+            'envelope_radius', envelope_radius, ...
+            'airspeed',        airspeed,        ...
+            'cruise_altitude', cruise_altitude_m  ...
+        ));
+        
+        py_output = Envelope_Drag_Module.run_model(py_input);
+        
+        drag_force_N           = double(py_output{'drag_force_N'});
+        cd                     = double(py_output{'cd'});
+        reynolds               = double(py_output{'reynolds'});
+        dynamic_pressure_Pa    = double(py_output{'dynamic_pressure_Pa'});
+        frontal_area_m2        = double(py_output{'frontal_area_m2'});
+        air_density_kg_m3      = double(py_output{'air_density_kg_m3'});
+        dynamic_viscosity_Pa_s = double(py_output{'dynamic_viscosity_Pa_s'});
+        
+        fprintf('Cd = %.4f\n', cd);
+        fprintf('Drag force (N) = %.4f\n', drag_force_N);
+    
+ 
+        kinematic_viscosity_m2_s = dynamic_viscosity_Pa_s / air_density_kg_m3;
+        
+        
+        gamma = 1.4;          
+        R_air = 287.058;      
+        temperature_K = 288.15; 
+        speed_of_sound_m_s = sqrt(gamma * R_air * temperature_K);
+        
+
+        [RPM_res(i), Eta_res(i), PowerShaft_res(i), PowerUseful_res(i)] = ...
+         AnalyzeProp(PropDesign, drag_force_N/2, airspeed, air_density_kg_m3, kinematic_viscosity_m2_s, speed_of_sound_m_s);
+       
+
+
+        if count(py.sys.path, '') == 0
+            insert(py.sys.path, int32(0), '');   % make sure current folder is on path
+        end
+        
+        try
+            HTM = py.importlib.import_module('Horizontal_Thruster_Module');
+            py.importlib.reload(HTM);
+        catch
+            HTM = py.importlib.import_module('Horizontal_Thruster_Module');
+        end
+        
+ 
+        
+        py_input = py.dict(pyargs( ...
+            'power_shaft_per_thruster_W',  PowerShaft_res(i),  ...
+            'motor_efficiency',            motor_eta,           ...
+            'timestep_s',                  timestep_s           ...
+        ));
+        
+        
+        py_output = HTM.run_model(py_input);
+        
+        
+        power_elec_per_thruster_W  = double(py_output{'power_elec_per_thruster_W'});
+        power_elec_total_W         = double(py_output{'power_elec_total_W'});
+        energy_per_thruster_J      = double(py_output{'energy_per_thruster_J'});
+        total_energy_J_thruster    = double(py_output{'energy_total_J'});
+        
+
+        fprintf('Total energy used by both thrusters     : %.4f J\n',   total_energy_J_thruster);
+    
+        
+        %Solar panel module
+        if py.importlib.util.find_spec('solar_power_generated') ~= py.None
+            solar_power_generated = py.importlib.import_module('solar_power_generated');
+            py.importlib.reload(solar_power_generated);
+        else
+            solar_power_generated = py.importlib.import_module('solar_power_generated');
+        end
+         
+        %here there should be a model that takes start date, time and also
+        %total time elapsed into account to calculate new time.
+         
+        py_input = py.dict(pyargs( ...
+            'start_latitude',        start_lat,        ...
+            'start_longitude',       start_lon,       ...
+            'destination_latitude',  end_lat,  ...
+            'destination_longitude', end_lon, ...
+            'start_year',            new_year,            ...
+            'start_month',           new_month,           ...
+            'start_day',             new_day,             ...
+            'start_hour',            new_hour,            ...
+            'start_minute',          new_minute,          ...
+            'duration_hours',        timestep_s/3600,        ...
+            'heading',               heading,               ...
+            'cruise_altitude',       cruise_altitude_m,       ...
+            'sp_area',               solar_area_per_panel,               ...
+            'sp_efficiency',         solar_panel_eta,         ...
+            'req_area',              solar_panel_area,              ...
+            'outer_envelope_radius', envelope_radius, ...
+            'timestep_minutes',      solar_timestep_s/60       ...
+        ));
+         
+        py_output = py.solar_power_generated.run_model(py_input);
+         
+         
+        total_energy_wh    = double(py_output{'total_energy_wh'});
+        total_energy_kwh   = double(py_output{'total_energy_kwh'});
+        total_energy_J     = double(py_output{'total_energy_J'});
+        peak_power_w       = double(py_output{'peak_power_w'});
+        avg_power_w        = double(py_output{'avg_power_w'});
+        mission_duration_h = double(py_output{'mission_duration_h'});
+        %num_panels         = double(py_output{'num_panels'});
+        num_rings          = double(py_output{'num_rings'});
+         
+         
+
+        fprintf('  Total energy produced by solar panels: %.1f J\n',   total_energy_J);
+        
+        
+        if total_energy_J < total_energy_J_thruster
+            fprintf('Used batteries for this timestep. \n\n')
+            battery_capacity = battery_capacity - ...
+                (total_energy_J_thruster - total_energy_J);
+            if battery_capacity<0
+                %penalty = 10e12;
+            end
+        
+            if counter == 0
+                battery_capacity_max = battery_capacity;
+                counter = 1;
+            else
+                if battery_capacity_max < battery_capacity
+                    battery_capacity_max = battery_capacity;
+                end
+            end
+        end
+        
+        if total_energy_J > total_energy_J_thruster
+            if battery_capacity < (num_battery*energy_per_battery)
+                battery_capacity = battery_capacity + ...
+                    (total_energy_J - total_energy_J_thruster);
+            end
+        end
+    
+        %fprintf('Battery capacity: %.3f J\n',  battery_capacity);
+        %fprintf('Battery capacity max: %.3f J\n',  battery_capacity_max);
+    
+        Energy_balance = Energy_balance + total_energy_J - total_energy_J_thruster;
+        fprintf('Energy balance: %.3f J\n',  Energy_balance);
+        fprintf('Iteration:%.3f done \n',  i);
+        fprintf('---------------------------------------------------------------\n')
+    end
+    
+    fprintf('Final Energy balance: %.3f J\n',  Energy_balance);
+    
+ 
+    strut_radius_h = 0.05;
+    strut_radius_v = 0.05;
+
+    
+    weight_batteries = weight_per_battery*num_battery;
+    %weight_propulsors = 6*weight_per_propulsor;
+    weight_propulsors_v = 10;
+    total_solar_panels_weight = solar_panel_weight_per_panel *num_panels;
+    weight_load_patch = num_load_patches*weight_per_load_patch;
+    
+    
+   
+    rho_air_sl = 1.225;  %kg/m³ sea level
+    
+    %geo
+    V_int     = (4/3) * pi * (envelope_radius-envelope_thickness)^3;
+    
+    
+    V_bal_max   = ballonet_volume_fraction_sl * V_int;        
+
+    V_usable    = V_bal_max;
+    
+    ballonet_radius  = (3 * V_bal_max / (4 * pi))^(1/3);     
+    ambient_gas_mass = rho_air_sl * V_usable;                
+
+    
+
+    dry_mass = weight_batteries+ 2*weight_propulsors_h + 4*weight_propulsors_v + weight_prop_struts + payload_weight + total_solar_panels_weight  + weight_load_patch;
+    fprintf('battery weight: %.3f kg\n',  weight_batteries);
+    fprintf('HP weight: %.3f kg\n',  2*weight_propulsors_h);
+    fprintf('VP weight: %.3f kg\n',  4*weight_propulsors_v);
+    fprintf('payload weight: %.3f kg\n',  payload_weight);
+    fprintf('SP weight: %.3f kg\n',  total_solar_panels_weight);
+    fprintf('Agm weight: %.3f kg\n',  ambient_gas_mass);
+    fprintf('dry mass weight: %.3f kg\n',  dry_mass);
+
+    if py.importlib.util.find_spec('envelope_buoyancy_module') ~= py.None
+        Buoyancy = py.importlib.import_module('envelope_buoyancy_module');
+        py.importlib.reload(Buoyancy);
+    else
+        Buoyancy = py.importlib.import_module('envelope_buoyancy_module');
+    end
+    py_input = py.dict(pyargs( ...
+            'mode',                         'constraint',              ...
+            'cruise_altitude_m',             cruise_altitude_m,                 ...
+            'radius',                        envelope_radius,                     ...
+            'ballonet_volume_fraction_sl',   ballonet_volume_fraction_sl,                     ...
+            'gas_density_sl',                gas_density_sl,        ...
+            'dry_mass',                      dry_mass,              ...
+            'envelope_mass_per_m2',          envelope_mass_per_m2,  ...
+            'envelope_thickness',            envelope_thickness,    ...
+            'ballonet_mass_per_m2',          ballonet_mass_per_m2,  ...
+            'ballonet_thickness',            ballonet_thickness,    ...
+            'ceiling_tolerance_m',           ceiling_tolerance_m    ...
+        ));
+    
+    
+    py_output = Buoyancy.run_model(py_input);
+    
+    
+    achievable_altitude_m    = double(py_output{'achievable_altitude_m'});
+    altitude_residual_m = double(py_output{'altitude_residual_m'});
+    gap_to_ceiling_m = double(py_output{'gap_to_ceiling_m'});
+    gas_mass_kg = double(py_output{'gas_mass_kg'});
+    envelope_mass_kg= double(py_output{'envelope_mass_kg'});
+    ballonet_mass_kg= double(py_output{'ballonet_mass_kg'});
+
+    fprintf('achievable_altitude_m: %.3f m\n',  achievable_altitude_m);
+    fprintf('altitude_residual_m: %.3f m\n',  altitude_residual_m);
+    fprintf('gap_to_ceiling_m: %.3f m\n',  gap_to_ceiling_m);
+
+
+    
+    
+
+
+
+    envelope_total_struc_mass = envelope_mass_kg + ballonet_mass_kg + gas_mass_kg;
+    
+    
+
+
+    if py.importlib.util.find_spec('solar_panel_min_radius') ~= py.None
+        MinRadius_Module = py.importlib.import_module('solar_panel_min_radius');
+        py.importlib.reload(MinRadius_Module);
+    else
+        MinRadius_Module = py.importlib.import_module('solar_panel_min_radius');
+    end
+
+    py_input = py.dict(pyargs( ...
+        'req_area',               solar_panel_area,               ... 
+        'area_per_panel',         solar_area_per_panel,         ... 
+        'min_ring_fraction',      0.15,                   ... 
+        'ring_spacing_factor',    1.0,                    ... 
+        'azimuth_spacing_factor', 1.1                     ... 
+    ));
+
+    py_output = MinRadius_Module.run_model(py_input);
+
+    min_radius_m      = 1.2*double(py_output{'min_radius_m'});
+    last_polar_deg    = double(py_output{'last_ring_polar_deg'});
+
+    fprintf('min radius: %.3f \n',  min_radius_m);
+
+
+    if achievable_altitude_m < cruise_altitude_m
+        penalty = penalty + 10*((abs(altitude_residual_m))) ;
+    end
+
+    if envelope_radius<(min_radius_m)
+        penalty = penalty + 10*(min_radius_m-envelope_radius);
+    end
+
+    if Energy_balance<0
+        penalty = penalty + 10*(abs(Energy_balance))/1e7;
+    end
+
+
+    max_envelope_weight = ...
+        (4*pi*(ranges(1,2)^2))*envelope_mass_per_m2;
+    
+    max_ballonet_weight = ...
+        (4*pi*( ...
+        (3*(ranges(10,2)* ...
+        ((4/3)*pi*(ranges(1,2)-envelope_thickness)^3)) ...
+        /(4*pi))^(1/3) ...
+        )^2)*ballonet_mass_per_m2;
+    
+    max_gas_mass = ...
+        gas_density_sl * ...
+        ((4/3)*pi*(ranges(1,2)-envelope_thickness)^3);
+    
+    max_weight_batteries = ...
+        weight_per_battery*ranges(3,2);
+    
+    py_pw_input = py.dict(pyargs( ...
+        'excel_path',params.blade_data_path, ...
+        'prop_radius_m',ranges(4,2), ...
+        'blade_count',ranges(7,2), ...
+        'hub_to_tip',ranges(6,2) ...
+    ));
+    
+    py_pw_output = ...
+        Prop_Weight_Module.run_model(py_pw_input);
+    
+    max_weight_propulsors_h = ...
+        double(py_pw_output{'total_assembly_weight_kg'});
+    
+    max_ambient_gas_mass = ...
+        rho_air_sl * ...
+        (ranges(10,2) * ...
+        (4/3)*pi*(ranges(1,2)-envelope_thickness)^3);
+    
+    max_solar_panels_weight = ...
+        solar_panel_weight_per_panel * ...
+        ranges(2,2)/solar_area_per_panel;
+
+
+
+
+    %U can optimize for minimum weight or minimum envelope for stealth
+    f0 = envelope_mass_kg/max_envelope_weight + ballonet_mass_kg/max_ballonet_weight + gas_mass_kg/max_gas_mass + weight_batteries/max_weight_batteries + 2*weight_propulsors_h/max_weight_propulsors_h  + total_solar_panels_weight/max_solar_panels_weight  + ambient_gas_mass/max_ambient_gas_mass + penalty;
+    %f0 =penalty;
+
+   
+
+    
+    fprintf('Ballonet radius            : %.3f m\n',  ballonet_radius);
+    fprintf('Ambient air in ballonet    : %.3f kg\n', ambient_gas_mass);
+    fprintf('Lifting gas mass           : %.3f kg\n', gas_mass_kg);
+
+
+    %Pack results
+    res.num_panels =num_panels;
+    res.ballonet_radius =ballonet_radius;
+    res.ambient_gas_mass=ambient_gas_mass;
+    res.min_radius_m = min_radius_m;
+    res.envelope_radius =envelope_radius;
+    res.solar_panel_area = solar_panel_area;
+    res.num_battery = num_battery;
+    res.prop_radius_h = prop_radius_h;
+    res.prop_radius_v = prop_radius_v;
+    res.strut_radius_h = strut_radius_h;
+    res.strut_radius_v = strut_radius_v;
+    res.J_h= J_h;
+    res.J_v  = J_v;
+    res.hub_to_tip_ratio_h  =hub_to_tip_ratio_h;
+    res.hub_to_tip_ratio_v  = hub_to_tip_ratio_v;
+    res.blade_count_h  = blade_count_h;
+    res.blade_count_v  = blade_count_v;
+    res.thrust_h  =thrust_h;
+    res.thrust_v  =thrust_v;
+    res.ballonet_volume_fraction_sl = ballonet_volume_fraction_sl;
+    
+    res.cruise_altitude_m = cruise_altitude_m;
+    %res.pressure_ceiling_m =pressure_ceiling_m;
+    res.achievable_altitude_m = achievable_altitude_m;
+    res.altitude_residual_m = altitude_residual_m;
+    res.gap_to_ceiling_m = gap_to_ceiling_m;
+    res.gas_mass_kg =gas_mass_kg;
+    res.Energy_balance = Energy_balance;
+    
+
+    res.rpm_h = rpm_h;
+    res.rpm_v = rpm_v;
+    res.weight_propulsors_v     = weight_propulsors_v;
+    res.weight_propulsors_h     = weight_propulsors_h;
+
+    res.weight_prop_struts = weight_prop_struts;
+    res.total_battery_weight     = weight_batteries;
+    res.total_solar_panels_weight = total_solar_panels_weight;
+    res.weight_ballonet     = ballonet_mass_kg;
+    res.weight_envelope = envelope_mass_kg;
+    res.total_load_patches_weight     = weight_load_patch;
+        
+
+
+    fprintf('c1: %.3f \n',  (-res.Energy_balance/1e7));
+    %fprintf('c2: %.3f \n', (res.altitude_residual_m - 500)/params.cruise_altitude_m);
+    fprintf('c3: %.3f \n', (params.cruise_altitude_m - res.achievable_altitude_m)/params.cruise_altitude_m);
+    fprintf('c4: %.3f \n',  ((100 - res.gap_to_ceiling_m)/100));
+    fprintf('c5: %.3f \n',  ((res.min_radius_m - res.envelope_radius)/6));
+    %fprintf('ceq1: %.3f \n',((0 - res.altitude_residual_m)/params.cruise_altitude_m))
+    fprintf('---------------------------------------------------------------\n\n\n')
+    
+
+    
+
+
+
+
+end
+
+
+
+

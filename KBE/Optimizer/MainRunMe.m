@@ -1,0 +1,143 @@
+%should also edit propeller geometry code
+
+function MainRunMe(params)
+fprintf('MATLAB variables loaded successfully.\n');
+
+
+envelope_radius_range    = [3, 20];
+num_panels_range   = [1,  500];%should be a function of max_envelope_radius?
+num_battery_range   = [1,  30]; %only discrete values
+prop_radius_h_range = [0.2, 5]; %
+prop_radius_v_range = [0.2, 5];
+strut_radius_h_range = [0.001, 5];
+strut_radius_v_range = [0.001, 5];
+J_h_range = [0.3, 0.9];    % physically meaningful advance ratio range
+J_v_range = [0.3, 0.9];
+hub_to_tip_ratio_h_range = [0.15, 0.5];
+hub_to_tip_ratio_v_range = [0.15, 0.5];
+blade_count_h_range = [2, 4];
+blade_count_v_range = [2, 4];
+thrust_h_range = [100, 1200];
+thrust_v_range = [100,1200];
+design_airspeed_range = [1,30];
+ballonet_volume_fraction_sl_range = [0.001, 0.9];
+ 
+%ranges = [envelope_radius_range; solar_panel_area_range; num_battery_range; prop_radius_h_range; prop_radius_v_range; strut_radius_h_range; strut_radius_v_range; J_h_range; J_v_range ; hub_to_tip_ratio_h_range; hub_to_tip_ratio_v_range; blade_count_h_range; blade_count_v_range; thrust_h_range; thrust_v_range;design_airspeed_range;ballonet_volume_fraction_sl_range];
+
+ranges = [envelope_radius_range; num_panels_range; num_battery_range; prop_radius_h_range; J_h_range; hub_to_tip_ratio_h_range; blade_count_h_range; thrust_h_range; design_airspeed_range;ballonet_volume_fraction_sl_range];
+params.ranges =ranges;
+
+ndv = 10;
+lb  = zeros(1, ndv);
+ub  = ones(1, ndv);
+
+rng(1);   % fixed seed for repeatability
+x0 = rand(1, ndv);
+x0 = [0.6, 0.3, 0.0594, 0.1365 , 0.6522, 0.7215, 0.7500, 0.2280, 0.6356, 0.0170];
+options = optimoptions('fmincon', ...
+    'Algorithm',              'sqp', ...
+    'Display',                'iter-detailed', ...
+    'MaxIterations',          200, ...
+    'MaxFunctionEvaluations', 5000, ...
+    'ConstraintTolerance',    1e-6, ...
+    'OptimalityTolerance',    1e-6, ...
+    'StepTolerance',          1e-10, ...
+    'ScaleProblem',false);
+    %'PlotFcns', {@optimplotfval, @optimplotx, @optimplotfirstorderopt, @optimplotconstrviolation});
+
+ %
+
+tic;
+[x_opt, fval, exitflag, output] = fmincon(@(x) objective(x, params), x0, [], [], [], [], lb, ub, @(x) constraints(x, params), options);
+t_elapsed = toc;
+
+%POST-PROCESS
+[~, res] = run_airship_analysis(x_opt, params);
+disp(x_opt);
+
+
+envelope_radius = res.envelope_radius;
+solar_panel_area = res.solar_panel_area;
+num_panels = res.num_panels;
+num_battery = res.num_battery;
+prop_radius_h = res.prop_radius_h;
+prop_radius_v = res.prop_radius_v;
+strut_radius_h = res.strut_radius_h;
+strut_radius_v = res.strut_radius_v;
+J_h = res.J_h;
+J_v = res.J_v;
+hub_to_tip_ratio_h = res.hub_to_tip_ratio_h;
+hub_to_tip_ratio_v = res.hub_to_tip_ratio_v;
+blade_count_h = res.blade_count_h;
+blade_count_v = res.blade_count_v;
+thrust_h = res.thrust_h;
+thrust_v = res.thrust_v;
+ballonet_volume_fraction_sl = res.ballonet_volume_fraction_sl;
+ballonet_radius= res.ballonet_radius;
+ambient_gas_mass=res.ambient_gas_mass;
+% 
+% 
+Generateproptables(res.PropDesign, prop_radius_h*2,res.air_density_kg_m3, res.kinematic_viscosity_m2_s, res.speed_of_sound_m_s);
+
+fprintf('Elapsed time: %.2f s,  Exit flag: %d\n', t_elapsed, exitflag);
+
+fprintf('\n--- Design Variables ---\n');
+fprintf('envelope_radius  = %.4f\n', envelope_radius);
+fprintf('num_panels  = %.4f\n', num_panels);
+fprintf('num_battery = %.0f\n', ceil(num_battery));
+fprintf('prop_radius_h  = %.4f\n', prop_radius_h);
+fprintf('strut_radius_h  = %.4f\n', strut_radius_h);
+fprintf('prop_radius_v  = %.4f\n', prop_radius_v);
+fprintf('strut_radius_v  = %.4f\n', strut_radius_v);
+fprintf('J_h  = %.4f\n', J_h);
+fprintf('J_v  = %.4f\n', J_v);
+fprintf('hub_to_tip_ratio_h  = %.4f\n', hub_to_tip_ratio_h);
+fprintf('hub_to_tip_ratio_v  = %.4f\n', hub_to_tip_ratio_v);
+fprintf('blade_count_h  = %.4f\n', blade_count_h);
+fprintf('blade_count_v  = %.4f\n', blade_count_v);
+fprintf('thrust_h  = %.4f\n', thrust_h);
+fprintf('thrust_v  = %.4f\n', thrust_v);
+fprintf('ballonet_volume_fraction_sl  = %.4f\n', ballonet_volume_fraction_sl);
+fprintf('ballonet_radius  = %.4f\n', ballonet_radius);
+fprintf('ambient_gas_mass  = %.4f\n', ambient_gas_mass);
+fprintf('weight_propulsors_h  = %.4f\n', res.weight_propulsors_h);
+fprintf('minimum envelope radius  = %.4f\n', res.min_radius_m);
+
+spinner_dia_h = hub_to_tip_ratio_h*(prop_radius_h*2);
+spinner_dia_v = hub_to_tip_ratio_v*(prop_radius_v*2);
+
+assignin('base', 'blade_count_h', blade_count_h);
+assignin('base', 'blade_count_v', blade_count_v);
+assignin('base', 'envelope_radius', envelope_radius);
+assignin('base', 'solar_panel_area', solar_panel_area);
+assignin('base', 'num_battery', ceil(num_battery)); 
+assignin('base', 'prop_radius_h', prop_radius_h); 
+assignin('base', 'strut_radius_h', strut_radius_h); 
+assignin('base', 'prop_radius_v', prop_radius_v); 
+assignin('base', 'strut_radius_v', strut_radius_v); 
+assignin('base', 'J_h', J_h); 
+assignin('base', 'J_v', J_v); 
+assignin('base', 'spinner_dia_h', spinner_dia_h); 
+assignin('base', 'spinner_dia_v', spinner_dia_v); 
+assignin('base', 'blade_count_h', blade_count_h); 
+assignin('base', 'blade_count_v', blade_count_v); 
+assignin('base', 'ballonet_radius', ballonet_radius); 
+assignin('base', 'ambient_gas_mass', ambient_gas_mass); 
+assignin('base', 'weight_propulsors_h', res.weight_propulsors_h); 
+assignin('base', 'weight_propulsors_v', res.weight_propulsors_v); 
+assignin('base', 'gas_mass_kg', res.gas_mass_kg); 
+
+
+% assignin('base', 'blade_count_h', 3);
+% assignin('base', 'blade_count_v', 5);
+% assignin('base', 'envelope_radius', 8);
+% assignin('base', 'solar_panel_area', 250);
+% assignin('base', 'num_battery', 1); 
+% assignin('base', 'prop_radius_h', 1); 
+% assignin('base', 'strut_radius_h', 0.05); 
+% assignin('base', 'prop_radius_v', 1.15); 
+% assignin('base', 'strut_radius_v', 0.05); 
+% assignin('base', 'J_h', 0.4); 
+% assignin('base', 'J_v', 0.4); 
+% assignin('base', 'spinner_dia_h', 0.3); 
+% assignin('base', 'spinner_dia_v', 0.3); 
