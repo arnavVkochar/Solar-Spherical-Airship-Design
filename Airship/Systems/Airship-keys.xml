@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Keyboard bindings for Spherical Solar Airship.
+
+  CONTROL SUMMARY
+  ───────────────────────────────────────────────
+  A              Engine 0 (PORT)  forward
+  a              Engine 0 (PORT)  reverse
+  D              Engine 1 (STBD)  forward
+  d              Engine 1 (STBD)  reverse
+  W / S          Vertical thrust UP / DOWN
+  Space          Zero vertical thrust
+  C / c          Stop ALL thrust
+  H              Altitude hold ON
+  Shift+H        Altitude hold OFF
+  B / b          Ballonet inflate / deflate
+  N / n          Ballonet neutral
+  F              Open gas valve (vent helium)
+  f              Close gas valve
+  Y              Release mooring
+  ───────────────────────────────────────────────
+-->
+<PropertyList>
+
+ <!-- ═══════════════════════════════════════════
+      ENGINE 0 (PORT horizontal)  —  A / a
+      A = full forward   a = full reverse
+ ═══════════════════════════════════════════════ -->
+
+ <key n="65">
+  <name>A</name>
+  <desc>Engine 0 PORT forward</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>nasal</command>
+     <script>
+     var v = airship._clamp(
+          (getprop("/fdm/jsbsim/fcs/engine0-cmd-norm") or 0) + 0.05,
+          -1.0, 1.0);
+     setprop("/fdm/jsbsim/fcs/engine0-cmd-norm", v);
+     gui.popupTip("Engine 0: " ~ int(v * 100) ~ "%");
+     </script>
+  </binding>
+ </key>
+
+ <key n="97">
+  <name>a</name>
+  <desc>Engine 0 PORT reverse</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>nasal</command>
+     <script>
+     var v = airship._clamp(
+          (getprop("/fdm/jsbsim/fcs/engine0-cmd-norm") or 0) - 0.05,
+          -1.0, 1.0);
+     setprop("/fdm/jsbsim/fcs/engine0-cmd-norm", v);
+     gui.popupTip("Engine 0: " ~ int(v * 100) ~ "%");
+     </script>
+  </binding>
+ </key>
+
+ <!-- ═══════════════════════════════════════════
+      ENGINE 1 (STARBOARD horizontal)  —  D / d
+      D = full forward   d = full reverse
+ ═══════════════════════════════════════════════ -->
+
+ <key n="68">
+  <name>D</name>
+  <desc>Engine 1 STARBOARD forward</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>nasal</command>
+     <script>
+     var v = airship._clamp(
+          (getprop("/fdm/jsbsim/fcs/engine1-cmd-norm") or 0) + 0.05,
+          -1.0, 1.0);
+     setprop("/fdm/jsbsim/fcs/engine1-cmd-norm", v);
+     gui.popupTip("Engine 1: " ~ int(v * 100) ~ "%");
+     </script>
+  </binding>
+ </key>
+
+ <key n="100">
+  <name>d</name>
+  <desc>Engine 1 STARBOARD reverse</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>nasal</command>
+     <script>
+     var v = airship._clamp(
+          (getprop("/fdm/jsbsim/fcs/engine1-cmd-norm") or 0) - 0.05,
+          -1.0, 1.0);
+     setprop("/fdm/jsbsim/fcs/engine1-cmd-norm", v);
+     gui.popupTip("Engine 1: " ~ int(v * 100) ~ "%");
+     </script>
+  </binding>
+ </key>
+
+ <!-- ═══════════════════════════════════════════
+      VERTICAL THRUST  (W / S)
+ ═══════════════════════════════════════════════ -->
+
+ <key n="87">
+  <name>W</name>
+  <desc>Vertical thrust UP</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>nasal</command>
+   <script>
+    var v = airship._clamp(
+        (getprop("/fdm/jsbsim/fcs/vertical-thrust-cmd-norm") or 0) + 0.05,
+        -1.0, 1.0);
+    setprop("/fdm/jsbsim/fcs/vertical-thrust-cmd-norm", v);
+   </script>
+  </binding>
+ </key>
+
+ <key n="83">
+  <name>S</name>
+  <desc>Vertical thrust DOWN</desc>
+  <repeatable type="bool">true</repeatable>
+  <binding>
+   <command>nasal</command>
+   <script>
+    var v = airship._clamp(
+        (getprop("/fdm/jsbsim/fcs/vertical-thrust-cmd-norm") or 0) - 0.05,
+        -1.0, 1.0);
+    setprop("/fdm/jsbsim/fcs/vertical-thrust-cmd-norm", v);
+   </script>
+  </binding>
+ </key>
+
+ <!-- ═══════════════════════════════════════════
+      SPACE — zero vertical thrust
+ ═══════════════════════════════════════════════ -->
+
+ <key n="32">
+  <name>Space</name>
+  <desc>Zero vertical thrust</desc>
+  <binding>
+   <command>nasal</command>
+   <script>
+    setprop("/fdm/jsbsim/fcs/vertical-thrust-cmd-norm", 0.0);
+    gui.popupTip("Vertical thrust zeroed.");
+   </script>
+  </binding>
+ </key>
+
+ <!-- ═══════════════════════════════════════════
+      EMERGENCY STOP  (C / c)
+      Zeros all engines
+ ═══════════════════════════════════════════════ -->
+
+ <key n="67">
+  <name>C</name>
+  <desc>Stop ALL thrust</desc>
+  <binding>
+   <command>nasal</command>
+   <script>
+    setprop("/fdm/jsbsim/fcs/engine0-cmd-norm",         0.0);
+    setprop("/fdm/jsbsim/fcs/engine1-cmd-norm",         0.0);
+    setprop("/fdm/jsbsim/fcs/vertical-thrust-cmd-norm", 0.0);
+    gui.popupTip("ALL thrust stopped.");
+   </script>
+  </binding>
+ </key>
+
+ <key n="99">
+  <name>c</name>
+  <desc>Stop ALL thrust</desc>
+  <binding>
+   <command>nasal</command>
+   <script>
+    setprop("/fdm/jsbsim/fcs/engine0-cmd-norm",         0.0);
+    setprop("/fdm/jsbsim/fcs/engine1-cmd-norm",         0.0);
+    setprop("/fdm/jsbsim/fcs/vertical-thrust-cmd-norm", 0.0);
+    gui.popupTip("ALL thrust stopped.");
+   </script>
+  </binding>
+ </key>
+
+ <!-- ═══════════════════════════════════════════
+      ALTITUDE HOLD  (h / H)
+ ═══════════════════════════════════════════════ -->
+
+ <key n="104">
+  <name>h</name>
+  <desc>Altitude hold ON</desc>
+  <binding>
+   <command>nasal</command>
+   <script>airship.alt_hold_start();</script>
+  </binding>
+ </key>
+
+ <key n="72">
+  <name>H</name>
+  <desc>Altitude hold OFF</desc>
+  <binding>
+   <command>nasal</command>
+   <script>airship.alt_hold_stop();</script>
+  </binding>
+ </key>
+
+
+
+ <!-- ═══════════════════════════════════════════
+      MOORING RELEASE  (Y)
+ ═══════════════════════════════════════════════ -->
+
+ <key n="89">
+  <name>Y</name>
+  <desc>Release mooring</desc>
+  <binding>
+   <command>nasal</command>
+   <script>Airship.release_mooring();</script>
+  </binding>
+</key>
+
+ <!-- ═══════════════════════════════════════════
+      GAS VALVE  (F open / f close)
+ ═══════════════════════════════════════════════ -->
+
+ <key n="70">
+  <name>F</name>
+  <desc>Open gas valve — vent helium</desc>
+  <binding>
+   <command>nasal</command>
+   <script>
+    gui.popupTip("Gas valve OPEN — venting helium!");
+    setprop("/fdm/jsbsim/buoyant_forces/gas-cell[0]/valve_open", 1.0);
+   </script>
+  </binding>
+ </key>
+
+ <key n="102">
+  <name>f</name>
+  <desc>Close gas valve</desc>
+  <binding>
+   <command>nasal</command>
+   <script>
+    gui.popupTip("Gas valve closed.");
+    setprop("/fdm/jsbsim/buoyant_forces/gas-cell[0]/valve_open", 0.0);
+   </script>
+  </binding>
+ </key>
+
+<key n="109">
+ <name>m</name>
+ <desc>Drop all ballast.</desc>
+ <binding>
+  <command>nasal</command>
+  <script>Airship.drop_ballast();</script>
+ </binding>
+</key>
+
+</PropertyList>
