@@ -1,0 +1,2833 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Spherical Airship Configurator</title>
+
+    <style>
+
+        :root {
+
+            --primary-color: #71f0c8;
+
+            --primary-hover: #68ffcf;
+
+            --secondary-color: #28a745;
+
+            --secondary-hover: #218838;
+
+            --bg-color: #f4f7f6;
+
+            --card-bg: #ffffff;
+
+            --text-color: #333333;
+
+            --border-color: #cccccc;
+
+        }
+
+
+        body {
+
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+            background-color: var(--bg-color);
+
+            color: var(--text-color);
+
+            margin: 0;
+
+            padding: 40px 20px;
+
+            display: flex;
+
+            justify-content: center;
+
+        }
+
+
+        .container {
+
+            background-color: var(--card-bg);
+
+            max-width: 850px;
+
+            width: 100%;
+
+            padding: 40px;
+
+            border-radius: 10px;
+
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+        }
+
+
+        h1 {
+
+            font-size: 32px;
+
+            margin-top: 0;
+
+            margin-bottom: 5px;
+
+            color: #111;
+
+        }
+
+
+        .version {
+
+            font-size: 13px;
+
+            color: #777;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        hr {
+
+            border: 0;
+
+            height: 1px;
+
+            background: #eaeaea;
+
+            margin: 25px 0;
+
+        }
+
+
+        p {
+
+            line-height: 1.6;
+
+            font-size: 15px;
+
+            color: #555;
+
+        }
+
+
+        a {
+
+            color: var(--primary-color);
+
+            text-decoration: none;
+
+            font-weight: 600;
+
+        }
+
+
+        a:hover { text-decoration: underline; }
+
+
+        .step {
+
+            color: var(--primary-color);
+
+            font-size: 20px;
+
+            margin-top: 40px;
+
+            margin-bottom: 20px;
+
+            border-bottom: 2px solid #edf2f7;
+
+            padding-bottom: 10px;
+
+        }
+
+
+        .sub-group {
+
+            background: #f8fafd;
+
+            border: 1px solid #e4eaf3;
+
+            border-radius: 8px;
+
+            padding: 16px 20px;
+
+            margin-bottom: 16px;
+
+        }
+
+
+        .sub-group-title {
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.06em;
+
+            color: #27b300;
+
+            margin-bottom: 14px;
+
+            padding-bottom: 6px;
+
+            border-bottom: 1px solid #dce6f2;
+
+        }
+
+
+        .form-section {
+
+            margin-bottom: 14px;
+
+            display: flex;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+        }
+
+
+        label {
+
+            display: inline-block;
+
+            width: 240px;
+
+            font-weight: 600;
+
+            color: #444;
+
+            flex-shrink: 0;
+
+        }
+
+
+        input[type="text"],
+
+        input[type="date"],
+
+        input[type="time"],
+
+        select {
+
+            padding: 8px 12px;
+
+            font-family: inherit;
+
+            font-size: 14px;
+
+            border: 1px solid var(--border-color);
+
+            border-radius: 6px;
+
+            background-color: #fff;
+
+            transition: border-color 0.2s;
+
+        }
+
+
+        input[type="text"]:focus,
+
+        input[type="date"]:focus,
+
+        input[type="time"]:focus,
+
+        select:focus {
+
+            outline: none;
+
+            border-color: var(--primary-color);
+
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+
+        }
+
+
+        input[type="text"] { width: 200px; }
+
+        input[type="date"], input[type="time"] { width: 150px; }
+
+        select { width: 226px; }
+
+
+        .dim-row {
+
+            display: flex;
+
+            gap: 12px;
+
+            align-items: center;
+
+        }
+
+
+        .dim-row input { width: 70px !important; }
+
+
+        .coord-label {
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            color: #666;
+
+        }
+
+
+        .hint {
+
+            font-size: 12px;
+
+            color: #888;
+
+            margin-left: 4px;
+
+        }
+
+
+        .cet-display {
+
+            font-style: italic;
+
+            color: #777;
+
+            font-size: 13px;
+
+            margin-left: 8px;
+
+            background: #f0f4f8;
+
+            padding: 4px 8px;
+
+            border-radius: 4px;
+
+        }
+
+
+        .radio-group {
+
+            display: flex;
+
+            gap: 20px;
+
+            margin-top: 5px;
+
+        }
+
+
+        .radio-group label {
+
+            width: auto;
+
+            font-weight: normal;
+
+            cursor: pointer;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+        }
+
+
+        .button-group {
+
+            margin-top: 40px;
+
+            display: flex;
+
+            gap: 15px;
+
+        }
+
+
+        button {
+
+            padding: 12px 24px;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            border: none;
+
+            border-radius: 6px;
+
+            color: white;
+
+            transition: background-color 0.2s, transform 0.1s;
+
+        }
+
+
+        button:active { transform: scale(0.98); }
+
+
+        .btn-primary { background-color: var(--primary-color); }
+
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-secondary { background-color: var(--secondary-color); }
+
+        .btn-secondary:hover { background-color: var(--secondary-hover); }
+
+
+        .calendar-wrapper { position: relative; display: inline-block; }
+
+
+        .calendar-icon-btn {
+
+            background: none;
+
+            border: 1px solid var(--border-color);
+
+            padding: 7px 10px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            border-radius: 6px;
+
+            color: #555;
+
+        }
+
+
+        .calendar-icon-btn:hover { background-color: #f0f0f0; }
+
+
+        .cal-popup {
+
+            display: none;
+
+            position: absolute;
+
+            top: 40px;
+
+            left: 0;
+
+            z-index: 100;
+
+            background: #fff;
+
+            border: 1px solid #ddd;
+
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+
+            border-radius: 8px;
+
+            padding: 15px;
+
+            width: 250px;
+
+            user-select: none;
+
+        }
+
+
+        .cal-popup.open { display: block; }
+
+
+        .cal-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .cal-header button {
+
+            background: #f0f4f8;
+
+            color: #333;
+
+            border: none;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+            padding: 4px 10px;
+
+            border-radius: 4px;
+
+        }
+
+
+        .cal-header button:hover { background: #e2e8f0; }
+
+
+        .cal-month-label { font-weight: bold; font-size: 14px; }
+
+
+        .cal-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(7, 1fr);
+
+            gap: 4px;
+
+        }
+
+
+        .cal-day-name {
+
+            text-align: center;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            color: #888;
+
+            padding: 4px 0;
+
+        }
+
+
+        .cal-cell {
+
+            text-align: center;
+
+            font-size: 13px;
+
+            padding: 6px 2px;
+
+            cursor: pointer;
+
+            border-radius: 4px;
+
+            transition: background 0.1s;
+
+        }
+
+
+        .cal-cell:hover { background: #f0f4f8; }
+
+        .cal-cell.empty { cursor: default; background: transparent; }
+
+        .cal-cell.selected { background: var(--primary-color); color: #fff; font-weight: bold; }
+
+        .cal-cell.today { font-weight: bold; color: var(--primary-color); border: 1px solid var(--primary-color); }
+
+
+        .duration-display {
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            margin-left: 8px;
+
+            color: var(--secondary-color);
+
+            background: #e6f4ea;
+
+            padding: 6px 12px;
+
+            border-radius: 6px;
+
+        }
+
+
+        .duration-error {
+
+            font-size: 14px;
+
+            margin-left: 8px;
+
+            color: #d32f2f;
+
+            font-weight: bold;
+
+            background: #ffebee;
+
+            padding: 6px 12px;
+
+            border-radius: 6px;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>Spherical Airship</h1>
+
+    <hr>
+
+    <p>
+
+        This form can be used to create spherical airship configuration files or mission requirements files for use with the
+
+        <a href="#">KBE</a> tool, developed to analyze and optimize spherical airships. The configuration file format produced using this utility is .xlsx.
+
+    </p>
+
+    <p>
+
+        Select your mode of operation below. <strong>Forward mode</strong> defines the aircraft's configuration for performance analysis. <strong>Inverse mode</strong> defines a required mission profile to generate an optimized configuration.
+
+    </p>
+
+    <hr>
+
+
+    <!-- ── MODE ── -->
+
+    <h2 class="step">Mode of operation</h2>
+
+
+    <div class="form-section">
+
+        <label>Study Name</label>
+
+        <input type="text" id="studyName" value="Analysis_1">
+
+    </div>
+
+
+    <div class="form-section">
+
+        <label>Mode</label>
+
+        <div class="radio-group">
+
+            <label><input type="radio" name="mode" value="forward" checked onchange="updateMode()"> Forward</label>
+
+            <label><input type="radio" name="mode" value="inverse" onchange="updateMode()"> Inverse</label>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         INVERSE MODE
+    ========================================================== -->
+
+    <div id="mission-section">
+        
+        <h2 class="step">Optimisation Mode</h2>
+
+<div class="sub-group">
+    <div class="form-section">
+        <label>Optimiser Type</label>
+        <div class="radio-group">
+            <label><input type="radio" name="optimMode" value="prelim" checked> Preliminary</label>
+            <label><input type="radio" name="optimMode" value="fullopt"> Full Optimizer</label>
+        </div>
+    </div>
+</div>
+
+        <!-- MISSION PROFILE -->
+
+        <h2 class="step">Mission Profile</h2>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Mission Timing</div>
+
+
+            <div class="form-section">
+
+                <label>Start Date</label>
+
+                <input type="date" id="startDate" onchange="syncCalendarFromInput(); updateDuration()">
+
+                <div class="calendar-wrapper" id="invCalWrapper">
+
+                    <button class="calendar-icon-btn" type="button" onclick="toggleCal()">📅</button>
+
+                    <div class="cal-popup" id="calPopup">
+
+                        <div class="cal-header">
+
+                            <button type="button" onclick="calNav(-1)">&#8249;</button>
+
+                            <span class="cal-month-label" id="calMonthLabel"></span>
+
+                            <button type="button" onclick="calNav(1)">&#8250;</button>
+
+                        </div>
+
+                        <div class="cal-grid" id="calGrid"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Start Time</label>
+
+                <input type="time" id="startTime" oninput="updateCET(); updateDuration()">
+
+                <select id="timezone" onchange="updateCET(); updateDuration()">
+
+                    <option value="Europe/Amsterdam" selected>Amsterdam (CET/CEST)</option>
+
+                    <option value="America/New_York">Eastern Time</option>
+
+                    <option value="America/Los_Angeles">Pacific Time</option>
+
+                    <option value="Asia/Tokyo">Tokyo</option>
+
+                </select>
+
+                <span class="cet-display" id="cetDisplay"></span>
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Destination Date</label>
+
+                <input type="date" id="destDate" onchange="updateDuration()">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Destination Reached Time</label>
+
+                <input type="time" id="destTime" oninput="updateDestCET(); updateDuration()">
+
+                <select id="destTimezone" onchange="updateDestCET(); updateDuration()">
+
+                    <option value="Europe/Amsterdam" selected>Amsterdam (CET/CEST)</option>
+
+                    <option value="America/New_York">Eastern Time</option>
+
+                    <option value="America/Los_Angeles">Pacific Time</option>
+
+                    <option value="Asia/Tokyo">Tokyo</option>
+
+                </select>
+
+                <span class="cet-display" id="destCetDisplay"></span>
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Mission Duration</label>
+
+                <span id="durationDisplay" class="duration-display" style="display:none;"></span>
+
+            </div>
+
+        </div>
+
+
+        <!-- MISSION PARAMETERS -->
+
+        <h2 class="step">Mission Parameters</h2>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Flight Conditions</div>
+
+
+            <div class="form-section">
+
+                <label>Cruise Altitude (m)</label>
+
+                <input type="text" id="cruiseAltitude" placeholder="e.g. 5000">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Ceiling Tolerance</label>
+
+                <input type="text" id="ceilingTolerance" placeholder="e.g. 0.1">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Loiter Coefficient</label>
+
+                <input type="text" id="loiterCoefficient" placeholder="e.g. 1.2">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Global Timestep (min)</label>
+
+                <input type="text" id="globalTimestep" placeholder="e.g. 5">
+
+            </div>
+
+        </div>
+
+
+        <!-- ENVELOPE & GAS -->
+
+        <h2 class="step">Envelope &amp; Gas</h2>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Envelope</div>
+
+
+            <div class="form-section">
+
+                <label>Envelope Thickness (m)</label>
+
+                <input type="text" id="invEnvelopeThickness" placeholder="e.g. 0.001">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Envelope Mass per m² (kg/m²)</label>
+
+                <input type="text" id="invEnvelopeMassPerM2" placeholder="e.g. 0.15">
+
+            </div>
+
+        </div>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Lifting Gas</div>
+
+
+            <div class="form-section">
+
+                <label>Gas Type</label>
+
+                <select id="invGasType" onchange="updateInverseGasDensityField()">
+
+                    <option value="hydrogen">Hydrogen (0.0899 kg/m³)</option>
+
+                    <option value="helium">Helium (0.1664 kg/m³)</option>
+
+                    <option value="custom">Custom</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-section" id="invGasDensityCustomRow" style="display:none;">
+
+                <label>Gas Density (kg/m³)</label>
+
+                <input type="text" id="invGasDensityCustom" placeholder="e.g. 0.12">
+
+            </div>
+
+        </div>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Ballonet</div>
+
+
+            <div class="form-section">
+
+                <label>Ballonet Max Volume Fraction</label>
+
+                <input type="text" id="ballonetMaxVolumeFraction" placeholder="e.g. 0.3">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Ballonet Thickness (m)</label>
+
+                <input type="text" id="invBallonetThickness" placeholder="e.g. 0.0005">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Ballonet Mass per m² (kg/m²)</label>
+
+                <input type="text" id="invBallonetMassPerM2" placeholder="e.g. 0.10">
+
+            </div>
+
+        </div>
+
+        <h2 class="step">Solar Panels</h2>
+
+        <div class="sub-group">
+
+            <div class="form-section">
+
+                <label>Solar Panel Area per Panel (m²)</label>
+
+                <input type="text" id="inv_solarPanelAreaPerPanel" placeholder="e.g. 0.5">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Solar Panel Weight per Panel (kg)</label>
+
+                <input type="text" id="inv_solarPanelWeight" placeholder="e.g. 0.25">
+
+            </div>
+
+        </div>
+
+
+        <!-- ENERGY SYSTEM -->
+
+        <h2 class="step">Energy System</h2>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Battery</div>
+
+
+            <div class="form-section">
+
+                <label>Energy Capacity per Battery (J)</label>
+
+                <input type="text" id="invEnergyCapacityPerBattery" placeholder="e.g. 100">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Battery Weight per Unit Volume (kg/m³)</label>
+
+                <input type="text" id="inv_batteryWeightVolume" placeholder="e.g. 400">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Battery Dimensions (m)</label>
+
+                <div class="dim-row">
+
+                    <span class="coord-label">L</span>
+
+                    <input type="text" id="inv_battL" placeholder="Length">
+
+                    <span class="coord-label">B</span>
+
+                    <input type="text" id="inv_battB" placeholder="Breadth">
+
+                    <span class="coord-label">H</span>
+
+                    <input type="text" id="inv_battH" placeholder="Height">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Efficiencies</div>
+
+
+            <div class="form-section">
+
+                <label>Solar Panel Efficiency</label>
+
+                <input type="text" id="solarPanelEfficiency" placeholder="e.g. 0.22">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Motor Efficiency</label>
+
+                <input type="text" id="motorEfficiency" placeholder="e.g. 0.9">
+
+            </div>
+
+        </div>
+
+
+        <!-- PAYLOAD -->
+
+        <h2 class="step">Payload</h2>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Mass &amp; Geometry</div>
+
+
+            <div class="form-section">
+
+                <label>Payload Weight (kg)</label>
+
+                <input type="text" id="inv_payload" placeholder="e.g. 0.5">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Payload D Factor</label>
+
+                <input type="text" id="inv_payloadDFactor" placeholder="e.g. 1.2">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Payload Dimensions (m)</label>
+
+                <div class="dim-row">
+
+                    <span class="coord-label">L</span>
+
+                    <input type="text" id="inv_dimL" placeholder="Length">
+
+                    <span class="coord-label">B</span>
+
+                    <input type="text" id="inv_dimB" placeholder="Breadth">
+
+                    <span class="coord-label">H</span>
+
+                    <input type="text" id="inv_dimH" placeholder="Height">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Load-Patch</div>
+
+
+            <div class="form-section">
+
+                <label>Load-Patch Radius (m)</label>
+
+                <input type="text" id="invLoadPatchRadius" placeholder="e.g. 0.12">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Payload Load-Patch Location</label>
+
+                <input type="text" id="invLoadPatchLocation" placeholder="0 – 1">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Load-Patch Thickness (m)</label>
+
+                <input type="text" id="invLoadPatchThickness" placeholder="e.g. 0.003">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Load-Patch Weight per Unit Volume (kg/m³)</label>
+
+                <input type="text" id="invLoadPatchWeightVolume" placeholder="e.g. 1200">
+
+            </div>
+
+        </div>
+
+
+    </div><!-- /mission-section -->
+
+
+    <!-- ══════════════════════════════════════════════════════
+         FORWARD MODE
+    ══════════════════════════════════════════════════════ -->
+
+    <div id="forward-section">
+
+
+        <!-- MISSION PARAMETERS (Forward) — now with full timing -->
+
+        <h2 class="step">Mission Parameters</h2>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Mission Timing</div>
+
+
+            <div class="form-section">
+
+                <label>Start Date</label>
+
+                <input type="date" id="fwd_startDate" onchange="fwdSyncCalendarFromInput(); fwdUpdateDuration()">
+
+                <div class="calendar-wrapper" id="fwdCalWrapper">
+
+                    <button class="calendar-icon-btn" type="button" onclick="fwdToggleCal()">📅</button>
+
+                    <div class="cal-popup" id="fwdCalPopup">
+
+                        <div class="cal-header">
+
+                            <button type="button" onclick="fwdCalNav(-1)">&#8249;</button>
+
+                            <span class="cal-month-label" id="fwdCalMonthLabel"></span>
+
+                            <button type="button" onclick="fwdCalNav(1)">&#8250;</button>
+
+                        </div>
+
+                        <div class="cal-grid" id="fwdCalGrid"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Start Time</label>
+
+                <input type="time" id="fwd_startTime" oninput="fwdUpdateCET(); fwdUpdateDuration()">
+
+                <select id="fwd_timezone" onchange="fwdUpdateCET(); fwdUpdateDuration()">
+
+                    <option value="Europe/Amsterdam" selected>Amsterdam (CET/CEST)</option>
+
+                    <option value="America/New_York">Eastern Time</option>
+
+                    <option value="America/Los_Angeles">Pacific Time</option>
+
+                    <option value="Asia/Tokyo">Tokyo</option>
+
+                </select>
+
+                <span class="cet-display" id="fwd_cetDisplay"></span>
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Destination Date</label>
+
+                <input type="date" id="fwd_destDate" onchange="fwdUpdateDuration()">
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Destination Reached Time</label>
+
+                <input type="time" id="fwd_destTime" oninput="fwdUpdateDestCET(); fwdUpdateDuration()">
+
+                <select id="fwd_destTimezone" onchange="fwdUpdateDestCET(); fwdUpdateDuration()">
+
+                    <option value="Europe/Amsterdam" selected>Amsterdam (CET/CEST)</option>
+
+                    <option value="America/New_York">Eastern Time</option>
+
+                    <option value="America/Los_Angeles">Pacific Time</option>
+
+                    <option value="Asia/Tokyo">Tokyo</option>
+
+                </select>
+
+                <span class="cet-display" id="fwd_destCetDisplay"></span>
+
+            </div>
+
+
+            <div class="form-section">
+
+                <label>Mission Duration</label>
+
+                <span id="fwd_durationDisplay" class="duration-display" style="display:none;"></span>
+
+            </div>
+
+        </div>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Flight Conditions</div>
+
+            <div class="form-section">
+
+                <label>Cruise Altitude (m)</label>
+
+                <input type="text" id="fwd_cruiseAltitude" placeholder="e.g. 5000">
+
+            </div>
+
+        </div>
+
+
+        <!-- 1. GEOMETRY & ENVELOPE -->
+
+        <h2 class="step">Geometry &amp; Envelope</h2>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Outer Envelope</div>
+
+            <div class="form-section">
+
+                <label>Outer Envelope Radius (m)</label>
+
+                <input type="text" id="radius" placeholder="e.g. 2.5">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Envelope Thickness (m)</label>
+
+                <input type="text" id="thickness" placeholder="e.g. 0.001">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Envelope Mass per m² (kg/m²)</label>
+
+                <input type="text" id="envelopeMassPerM2" placeholder="e.g. 0.15">
+
+            </div>
+
+        </div>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Lifting Gas</div>
+
+            <div class="form-section">
+
+                <label>Gas Type</label>
+
+                <select id="gasType" onchange="updateGasDensityField()">
+
+                    <option value="hydrogen">Hydrogen (0.0899 kg/m³)</option>
+
+                    <option value="helium">Helium (0.1664 kg/m³)</option>
+
+                    <option value="custom">Custom</option>
+
+                </select>
+
+            </div>
+
+            <div class="form-section" id="gasDensityCustomRow" style="display:none;">
+
+                <label>Gas Density (kg/m³)</label>
+
+                <input type="text" id="gasDensityCustom" placeholder="e.g. 0.12">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Gas Mass (kg)</label>
+
+                <input type="text" id="gasMass" placeholder="e.g. 0.5">
+
+            </div>
+
+        </div>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Ballonet</div>
+
+            <div class="form-section">
+
+                <label>Ballonet Radius (m)</label>
+
+                <input type="text" id="ballRadius" placeholder="e.g. 0.8">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Ballonet Thickness (m)</label>
+
+                <input type="text" id="ballThickness" placeholder="e.g. 0.0005">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Ballonet Mass per m² (kg/m²)</label>
+
+                <input type="text" id="ballMassPerM2" placeholder="e.g. 0.10">
+
+            </div>
+
+        </div>
+
+
+        <!-- 2. SOLAR PANELS -->
+
+        <h2 class="step">Solar Panels</h2>
+
+
+        <div class="sub-group">
+
+            <div class="form-section">
+
+                <label>Required Solar Panel Area (m²)</label>
+
+                <input type="text" id="requiredSolarPanelArea" placeholder="e.g. 10.0">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Solar Panel Area per Panel (m²)</label>
+
+                <input type="text" id="solarPanelAreaPerPanel" placeholder="e.g. 0.5">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Solar Panel Weight per Panel (kg)</label>
+
+                <input type="text" id="solarPanelWeight" placeholder="e.g. 0.25">
+
+            </div>
+
+        </div>
+
+
+        <!-- 3. BATTERY -->
+
+        <h2 class="step">Battery</h2>
+
+
+        <div class="sub-group">
+
+            <div class="form-section">
+
+                <label>Number of Batteries</label>
+
+                <input type="text" id="numBatteries" placeholder="e.g. 4">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Energy Capacity per Battery (J)</label>
+
+                <input type="text" id="energyCapacityPerBattery" placeholder="e.g. 100">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Battery Weight per Unit Volume (kg/m³)</label>
+
+                <input type="text" id="batteryWeightVolume" placeholder="e.g. 400">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Battery Dimensions (m)</label>
+
+                <div class="dim-row">
+
+                    <span class="coord-label">L</span>
+
+                    <input type="text" id="battL" placeholder="Length">
+
+                    <span class="coord-label">B</span>
+
+                    <input type="text" id="battB" placeholder="Breadth">
+
+                    <span class="coord-label">H</span>
+
+                    <input type="text" id="battH" placeholder="Height">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- 4. PROPULSION -->
+
+        <h2 class="step">Propulsion</h2>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Vertical Propulsor</div>
+
+            <div class="form-section">
+
+                <label>Vertical Propeller Radius (m)</label>
+
+                <input type="text" id="vertPropRadius" placeholder="e.g. 0.3">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>No. of Blades — Vertical</label>
+
+                <input type="text" id="vertBlades" placeholder="e.g. 3">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Vertical Propulsor Location</label>
+
+                <input type="text" id="vertPropLoc" placeholder="0 – 1">
+
+                <span class="hint">0 = bottom pole, 1 = top pole</span>
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Vertical Strut Size (m)</label>
+
+                <input type="text" id="vertStrutSize" placeholder="e.g. 0.05">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Vertical Strut Radius (m)</label>
+
+                <input type="text" id="vertStrutRadius" placeholder="e.g. 0.008">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Vertical Propeller Weight per Prop (kg)</label>
+
+                <input type="text" id="vertPropWeight" placeholder="e.g. 5">
+
+            </div>
+
+        </div>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Horizontal Propulsor</div>
+
+            <div class="form-section">
+
+                <label>Horizontal Propeller Radius (m)</label>
+
+                <input type="text" id="horizPropRadius" placeholder="e.g. 0.3">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>No. of Blades — Horizontal</label>
+
+                <input type="text" id="horizBlades" placeholder="e.g. 3">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Horizontal Propulsor Location</label>
+
+                <input type="text" id="horizPropLoc" placeholder="0 – 1">
+
+                <span class="hint">0 = equator, 1 = pole</span>
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Horizontal Strut Size (m)</label>
+
+                <input type="text" id="horizStrutSize" placeholder="e.g. 0.05">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Horizontal Strut Radius (m)</label>
+
+                <input type="text" id="horizStrutRadius" placeholder="e.g. 0.008">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Horizontal Propeller Weight per Prop (kg)</label>
+
+                <input type="text" id="horiPropWeight" placeholder="e.g. 5">
+
+            </div>
+
+        </div>
+
+
+        <!-- 5. PAYLOAD -->
+
+        <h2 class="step">Payload</h2>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Mass &amp; Geometry</div>
+
+            <div class="form-section">
+
+                <label>Payload Weight (kg)</label>
+
+                <input type="text" id="payload" placeholder="e.g. 0.5">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Payload D Factor</label>
+
+                <input type="text" id="payloadDFactor" placeholder="e.g. 1.2">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Payload Dimensions (m)</label>
+
+                <div class="dim-row">
+
+                    <span class="coord-label">L</span>
+
+                    <input type="text" id="dimL" placeholder="Length">
+
+                    <span class="coord-label">B</span>
+
+                    <input type="text" id="dimB" placeholder="Breadth">
+
+                    <span class="coord-label">H</span>
+
+                    <input type="text" id="dimH" placeholder="Height">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="sub-group">
+
+            <div class="sub-group-title">Load-Patch</div>
+
+            <div class="form-section">
+
+                <label>Load-Patch Radius (m)</label>
+
+                <input type="text" id="loadPatchRadius" placeholder="e.g. 0.12">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Payload Load-Patch Location</label>
+
+                <input type="text" id="loadPatchLocation" placeholder="0 – 1">
+
+                <span class="hint">Normalised along envelope meridian</span>
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Load-Patch Thickness (m)</label>
+
+                <input type="text" id="loadPatchThickness" placeholder="e.g. 0.003">
+
+            </div>
+
+            <div class="form-section">
+
+                <label>Load-Patch Weight per Unit Volume (kg/m³)</label>
+
+                <input type="text" id="loadPatchWeightVolume" placeholder="e.g. 1200">
+
+            </div>
+
+        </div>
+
+
+    </div><!-- /forward-section -->
+
+
+    <!-- ── BUTTONS ── -->
+
+    <div class="button-group">
+
+        <button class="btn-primary" onclick="generateExcel()">Generate Config File</button>
+
+        <button id="missionPlannerBtn" class="btn-secondary" onclick="openMissionPlanner()">Mission Planner</button>
+
+    </div>
+
+</div><!-- /container -->
+
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+
+<script>
+
+// ── MODE ──────────────────────────────────────────────────────────────────────
+
+function updateMode() {
+
+    const mode       = document.querySelector('input[name="mode"]:checked').value;
+
+    const mission    = document.getElementById("mission-section");
+
+    const forward    = document.getElementById("forward-section");
+
+    const plannerBtn = document.getElementById("missionPlannerBtn");
+
+
+    if (mode === "forward") {
+
+        mission.style.display    = "none";
+
+        forward.style.display    = "block";
+
+        plannerBtn.style.display = "inline-block";
+
+    } else {
+
+        mission.style.display    = "block";
+
+        forward.style.display    = "none";
+
+        plannerBtn.style.display = "inline-block";
+
+    }
+
+}
+
+
+// ── GAS DENSITY CUSTOM TOGGLE ─────────────────────────────────────────────────
+
+function updateGasDensityField() {
+
+    const isCustom = document.getElementById("gasType").value === "custom";
+
+    document.getElementById("gasDensityCustomRow").style.display = isCustom ? "flex" : "none";
+
+}
+
+
+function updateInverseGasDensityField() {
+
+    const isCustom = document.getElementById("invGasType").value === "custom";
+
+    document.getElementById("invGasDensityCustomRow").style.display = isCustom ? "flex" : "none";
+
+}
+
+
+function resolvedGasDensity() {
+
+    const type = document.getElementById("gasType").value;
+
+    if (type === "hydrogen") return "0.0899";
+
+    if (type === "helium")   return "0.1664";
+
+    return document.getElementById("gasDensityCustom").value;
+
+}
+
+
+function resolvedGasLabel() {
+
+    const type = document.getElementById("gasType").value;
+
+    if (type === "hydrogen") return "Hydrogen";
+
+    if (type === "helium")   return "Helium";
+
+    return "Custom";
+
+}
+
+
+function resolvedInvGasDensity() {
+
+    const type = document.getElementById("invGasType").value;
+
+    if (type === "hydrogen") return "0.0899";
+
+    if (type === "helium")   return "0.1664";
+
+    return document.getElementById("invGasDensityCustom").value;
+
+}
+
+
+function resolvedInvGasLabel() {
+
+    const type = document.getElementById("invGasType").value;
+
+    if (type === "hydrogen") return "Hydrogen";
+
+    if (type === "helium")   return "Helium";
+
+    return "Custom";
+
+}
+
+
+// ── MISSION PLANNER ───────────────────────────────────────────────────────────
+
+function openMissionPlanner() {
+
+    window.open('file:///C:/Users/Arnesh/Documents/KBE/Mission_planner.html', '_blank');
+
+}
+
+
+// ── DST-AWARE OFFSET HELPER (shared) ─────────────────────────────────────────
+
+function getUtcOffsetMinutes(ianaZone, dateStr, timeStr) {
+
+    const [year, month, day] = dateStr
+
+        ? dateStr.split("-").map(Number)
+
+        : (() => { const n = new Date(); return [n.getFullYear(), n.getMonth()+1, n.getDate()]; })();
+
+    const [hh, mm] = timeStr ? timeStr.split(":").map(Number) : [12, 0];
+
+
+    const utcDate = new Date(Date.UTC(year, month-1, day, hh, mm, 0));
+
+
+    const fmt = new Intl.DateTimeFormat("en-CA", {
+
+        timeZone: ianaZone,
+
+        year: "numeric", month: "2-digit", day: "2-digit",
+
+        hour: "2-digit", minute: "2-digit", hour12: false
+
+    });
+
+
+    const parts = fmt.formatToParts(utcDate);
+
+    const p = {};
+
+    parts.forEach(({type, value}) => { p[type] = value; });
+
+
+    let localH = parseInt(p.hour, 10);
+
+    if (localH === 24) localH = 0;
+
+    const localM   = parseInt(p.minute, 10);
+
+    const localDay = parseInt(p.day, 10);
+
+
+    const utcTotalMin   = hh * 60 + mm;
+
+    let   localTotalMin = localH * 60 + localM;
+
+    const utcDay        = utcDate.getUTCDate();
+
+
+    if (localDay !== utcDay) {
+
+        localTotalMin += (localDay > utcDay || (utcDay >= 28 && localDay <= 2)) ? 1440 : -1440;
+
+    }
+
+
+    return localTotalMin - utcTotalMin;
+
+}
+
+
+// ── INVERSE MODE — DURATION CALCULATOR ───────────────────────────────────────
+
+function updateDuration() {
+
+    const display   = document.getElementById("durationDisplay");
+
+    const startDate = document.getElementById("startDate").value;
+
+    const startTime = document.getElementById("startTime").value;
+
+    const destDate  = document.getElementById("destDate").value;
+
+    const destTime  = document.getElementById("destTime").value;
+
+
+    if (!startDate || !startTime || !destDate || !destTime) {
+
+        display.style.display = "none";
+
+        return;
+
+    }
+
+
+    display.style.display = "inline-block";
+
+    const startTz = document.getElementById("timezone").value;
+
+    const destTz  = document.getElementById("destTimezone").value;
+
+
+    const startOffsetMin = getUtcOffsetMinutes(startTz, startDate, startTime);
+
+    const destOffsetMin  = getUtcOffsetMinutes(destTz,  destDate,  destTime);
+
+
+    const [sh, sm] = startTime.split(":").map(Number);
+
+    const [dh, dm] = destTime.split(":").map(Number);
+
+
+    const startUtcMs = new Date(`${startDate}T00:00:00Z`).getTime() + (sh*60 + sm - startOffsetMin)*60000;
+
+    const destUtcMs  = new Date(`${destDate}T00:00:00Z`).getTime()  + (dh*60 + dm - destOffsetMin) *60000;
+
+    const diffMin    = Math.round((destUtcMs - startUtcMs) / 60000);
+
+
+    if (diffMin < 0) {
+
+        display.textContent = "⚠ Destination time is before start time";
+
+        display.className   = "duration-error";
+
+        return;
+
+    }
+
+    if (diffMin === 0) {
+
+        display.textContent = "⚠ Duration is zero";
+
+        display.className   = "duration-error";
+
+        return;
+
+    }
+
+
+    const days  = Math.floor(diffMin / 1440);
+
+    const hours = Math.floor((diffMin % 1440) / 60);
+
+    const mins  = diffMin % 60;
+
+    const parts = [];
+
+    if (days  > 0) parts.push(`${days}d`);
+
+    if (hours > 0) parts.push(`${hours}h`);
+
+    if (mins  > 0) parts.push(`${mins}m`);
+
+
+    display.textContent = `→ ${parts.join(" ")}`;
+
+    display.className   = "duration-display";
+
+}
+
+
+// ── FORWARD MODE — DURATION CALCULATOR ───────────────────────────────────────
+
+function fwdUpdateDuration() {
+
+    const display   = document.getElementById("fwd_durationDisplay");
+
+    const startDate = document.getElementById("fwd_startDate").value;
+
+    const startTime = document.getElementById("fwd_startTime").value;
+
+    const destDate  = document.getElementById("fwd_destDate").value;
+
+    const destTime  = document.getElementById("fwd_destTime").value;
+
+
+    if (!startDate || !startTime || !destDate || !destTime) {
+
+        display.style.display = "none";
+
+        return;
+
+    }
+
+
+    display.style.display = "inline-block";
+
+    const startTz = document.getElementById("fwd_timezone").value;
+
+    const destTz  = document.getElementById("fwd_destTimezone").value;
+
+
+    const startOffsetMin = getUtcOffsetMinutes(startTz, startDate, startTime);
+
+    const destOffsetMin  = getUtcOffsetMinutes(destTz,  destDate,  destTime);
+
+
+    const [sh, sm] = startTime.split(":").map(Number);
+
+    const [dh, dm] = destTime.split(":").map(Number);
+
+
+    const startUtcMs = new Date(`${startDate}T00:00:00Z`).getTime() + (sh*60 + sm - startOffsetMin)*60000;
+
+    const destUtcMs  = new Date(`${destDate}T00:00:00Z`).getTime()  + (dh*60 + dm - destOffsetMin) *60000;
+
+    const diffMin    = Math.round((destUtcMs - startUtcMs) / 60000);
+
+
+    if (diffMin < 0) {
+
+        display.textContent = "⚠ Destination time is before start time";
+
+        display.className   = "duration-error";
+
+        return;
+
+    }
+
+    if (diffMin === 0) {
+
+        display.textContent = "⚠ Duration is zero";
+
+        display.className   = "duration-error";
+
+        return;
+
+    }
+
+
+    const days  = Math.floor(diffMin / 1440);
+
+    const hours = Math.floor((diffMin % 1440) / 60);
+
+    const mins  = diffMin % 60;
+
+    const parts = [];
+
+    if (days  > 0) parts.push(`${days}d`);
+
+    if (hours > 0) parts.push(`${hours}h`);
+
+    if (mins  > 0) parts.push(`${mins}m`);
+
+
+    display.textContent = `→ ${parts.join(" ")}`;
+
+    display.className   = "duration-display";
+
+}
+
+
+// ── INVERSE MODE — CET/CEST CONVERSION ───────────────────────────────────────
+
+function updateCET() {
+
+    const timeVal    = document.getElementById("startTime").value;
+
+    const ianaZone   = document.getElementById("timezone").value;
+
+    const dateVal    = document.getElementById("startDate").value;
+
+    const cetDisplay = document.getElementById("cetDisplay");
+
+
+    if (!timeVal) { cetDisplay.textContent = ""; return; }
+
+
+    const effectiveDate = dateVal || new Date().toISOString().slice(0, 10);
+
+    const srcOffsetMin  = getUtcOffsetMinutes(ianaZone, effectiveDate, timeVal);
+
+    const cetOffsetMin  = getUtcOffsetMinutes("Europe/Amsterdam", effectiveDate, timeVal);
+
+    const cetLabel      = cetOffsetMin === 120 ? "CEST" : "CET";
+
+
+    const [h, m]      = timeVal.split(":").map(Number);
+
+    const srcTotalMin = h * 60 + m;
+
+    const utcMin      = srcTotalMin - srcOffsetMin;
+
+    const cetMin      = ((utcMin + cetOffsetMin) % 1440 + 1440) % 1440;
+
+
+    const pad = n => String(n).padStart(2, "0");
+
+    cetDisplay.textContent = `\u2192 ${pad(Math.floor(cetMin/60))}:${pad(cetMin%60)} ${cetLabel}`;
+
+}
+
+
+function updateDestCET() {
+
+    const timeVal    = document.getElementById("destTime").value;
+
+    const ianaZone   = document.getElementById("destTimezone").value;
+
+    const dateVal    = document.getElementById("startDate").value;
+
+    const cetDisplay = document.getElementById("destCetDisplay");
+
+
+    if (!timeVal) { cetDisplay.textContent = ""; return; }
+
+
+    const effectiveDate = dateVal || new Date().toISOString().slice(0, 10);
+
+    const srcOffsetMin  = getUtcOffsetMinutes(ianaZone, effectiveDate, timeVal);
+
+    const cetOffsetMin  = getUtcOffsetMinutes("Europe/Amsterdam", effectiveDate, timeVal);
+
+    const cetLabel      = cetOffsetMin === 120 ? "CEST" : "CET";
+
+
+    const [h, m]      = timeVal.split(":").map(Number);
+
+    const srcTotalMin = h * 60 + m;
+
+    const utcMin      = srcTotalMin - srcOffsetMin;
+
+    const cetMin      = ((utcMin + cetOffsetMin) % 1440 + 1440) % 1440;
+
+
+    const pad = n => String(n).padStart(2, "0");
+
+    cetDisplay.textContent = `\u2192 ${pad(Math.floor(cetMin/60))}:${pad(cetMin%60)} ${cetLabel}`;
+
+}
+
+
+// ── FORWARD MODE — CET/CEST CONVERSION ───────────────────────────────────────
+
+function fwdUpdateCET() {
+
+    const timeVal    = document.getElementById("fwd_startTime").value;
+
+    const ianaZone   = document.getElementById("fwd_timezone").value;
+
+    const dateVal    = document.getElementById("fwd_startDate").value;
+
+    const cetDisplay = document.getElementById("fwd_cetDisplay");
+
+
+    if (!timeVal) { cetDisplay.textContent = ""; return; }
+
+
+    const effectiveDate = dateVal || new Date().toISOString().slice(0, 10);
+
+    const srcOffsetMin  = getUtcOffsetMinutes(ianaZone, effectiveDate, timeVal);
+
+    const cetOffsetMin  = getUtcOffsetMinutes("Europe/Amsterdam", effectiveDate, timeVal);
+
+    const cetLabel      = cetOffsetMin === 120 ? "CEST" : "CET";
+
+
+    const [h, m]      = timeVal.split(":").map(Number);
+
+    const srcTotalMin = h * 60 + m;
+
+    const utcMin      = srcTotalMin - srcOffsetMin;
+
+    const cetMin      = ((utcMin + cetOffsetMin) % 1440 + 1440) % 1440;
+
+
+    const pad = n => String(n).padStart(2, "0");
+
+    cetDisplay.textContent = `\u2192 ${pad(Math.floor(cetMin/60))}:${pad(cetMin%60)} ${cetLabel}`;
+
+}
+
+
+function fwdUpdateDestCET() {
+
+    const timeVal    = document.getElementById("fwd_destTime").value;
+
+    const ianaZone   = document.getElementById("fwd_destTimezone").value;
+
+    const dateVal    = document.getElementById("fwd_startDate").value;
+
+    const cetDisplay = document.getElementById("fwd_destCetDisplay");
+
+
+    if (!timeVal) { cetDisplay.textContent = ""; return; }
+
+
+    const effectiveDate = dateVal || new Date().toISOString().slice(0, 10);
+
+    const srcOffsetMin  = getUtcOffsetMinutes(ianaZone, effectiveDate, timeVal);
+
+    const cetOffsetMin  = getUtcOffsetMinutes("Europe/Amsterdam", effectiveDate, timeVal);
+
+    const cetLabel      = cetOffsetMin === 120 ? "CEST" : "CET";
+
+
+    const [h, m]      = timeVal.split(":").map(Number);
+
+    const srcTotalMin = h * 60 + m;
+
+    const utcMin      = srcTotalMin - srcOffsetMin;
+
+    const cetMin      = ((utcMin + cetOffsetMin) % 1440 + 1440) % 1440;
+
+
+    const pad = n => String(n).padStart(2, "0");
+
+    cetDisplay.textContent = `\u2192 ${pad(Math.floor(cetMin/60))}:${pad(cetMin%60)} ${cetLabel}`;
+
+}
+
+
+// ── INVERSE MODE — CALENDAR ───────────────────────────────────────────────────
+
+let calYear, calMonth;
+
+
+function initCal() {
+
+    const today = new Date();
+
+    calYear  = today.getFullYear();
+
+    calMonth = today.getMonth();
+
+    renderCal();
+
+}
+
+
+function toggleCal() {
+
+    document.getElementById("calPopup").classList.toggle("open");
+
+    renderCal();
+
+}
+
+
+function closeCal() {
+
+    document.getElementById("calPopup").classList.remove("open");
+
+}
+
+
+function calNav(dir) {
+
+    calMonth += dir;
+
+    if (calMonth > 11) { calMonth = 0;  calYear++; }
+
+    if (calMonth < 0)  { calMonth = 11; calYear--; }
+
+    renderCal();
+
+}
+
+
+function syncCalendarFromInput() {
+
+    const val = document.getElementById("startDate").value;
+
+    if (val) {
+
+        const d = new Date(val + "T00:00:00");
+
+        calYear  = d.getFullYear();
+
+        calMonth = d.getMonth();
+
+        renderCal();
+
+    }
+
+}
+
+
+function renderCal() {
+
+    const months = ["January","February","March","April","May","June",
+
+                    "July","August","September","October","November","December"];
+
+    document.getElementById("calMonthLabel").textContent = `${months[calMonth]} ${calYear}`;
+
+
+    const grid = document.getElementById("calGrid");
+
+    grid.innerHTML = "";
+
+
+    ["Su","Mo","Tu","We","Th","Fr","Sa"].forEach(d => {
+
+        const cell = document.createElement("div");
+
+        cell.className = "cal-day-name";
+
+        cell.textContent = d;
+
+        grid.appendChild(cell);
+
+    });
+
+
+    const firstDay    = new Date(calYear, calMonth, 1).getDay();
+
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+    const today       = new Date();
+
+    const selectedVal = document.getElementById("startDate").value;
+
+
+    for (let i = 0; i < firstDay; i++) {
+
+        const cell = document.createElement("div");
+
+        cell.className = "cal-cell empty";
+
+        grid.appendChild(cell);
+
+    }
+
+
+    for (let day = 1; day <= daysInMonth; day++) {
+
+        const cell = document.createElement("div");
+
+        cell.className = "cal-cell";
+
+        cell.textContent = day;
+
+
+        const isoDate = `${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+
+        if (isoDate === selectedVal) cell.classList.add("selected");
+
+        if (day === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear())
+
+            cell.classList.add("today");
+
+
+        cell.addEventListener("click", () => {
+
+            document.getElementById("startDate").value = isoDate;
+
+            closeCal();
+
+        });
+
+
+        grid.appendChild(cell);
+
+    }
+
+}
+
+
+// ── FORWARD MODE — CALENDAR ───────────────────────────────────────────────────
+
+let fwdCalYear, fwdCalMonth;
+
+
+function fwdInitCal() {
+
+    const today = new Date();
+
+    fwdCalYear  = today.getFullYear();
+
+    fwdCalMonth = today.getMonth();
+
+    fwdRenderCal();
+
+}
+
+
+function fwdToggleCal() {
+
+    document.getElementById("fwdCalPopup").classList.toggle("open");
+
+    fwdRenderCal();
+
+}
+
+
+function fwdCloseCal() {
+
+    document.getElementById("fwdCalPopup").classList.remove("open");
+
+}
+
+
+function fwdCalNav(dir) {
+
+    fwdCalMonth += dir;
+
+    if (fwdCalMonth > 11) { fwdCalMonth = 0;  fwdCalYear++; }
+
+    if (fwdCalMonth < 0)  { fwdCalMonth = 11; fwdCalYear--; }
+
+    fwdRenderCal();
+
+}
+
+
+function fwdSyncCalendarFromInput() {
+
+    const val = document.getElementById("fwd_startDate").value;
+
+    if (val) {
+
+        const d = new Date(val + "T00:00:00");
+
+        fwdCalYear  = d.getFullYear();
+
+        fwdCalMonth = d.getMonth();
+
+        fwdRenderCal();
+
+    }
+
+}
+
+
+function fwdRenderCal() {
+
+    const months = ["January","February","March","April","May","June",
+
+                    "July","August","September","October","November","December"];
+
+    document.getElementById("fwdCalMonthLabel").textContent = `${months[fwdCalMonth]} ${fwdCalYear}`;
+
+
+    const grid = document.getElementById("fwdCalGrid");
+
+    grid.innerHTML = "";
+
+
+    ["Su","Mo","Tu","We","Th","Fr","Sa"].forEach(d => {
+
+        const cell = document.createElement("div");
+
+        cell.className = "cal-day-name";
+
+        cell.textContent = d;
+
+        grid.appendChild(cell);
+
+    });
+
+
+    const firstDay    = new Date(fwdCalYear, fwdCalMonth, 1).getDay();
+
+    const daysInMonth = new Date(fwdCalYear, fwdCalMonth + 1, 0).getDate();
+
+    const today       = new Date();
+
+    const selectedVal = document.getElementById("fwd_startDate").value;
+
+
+    for (let i = 0; i < firstDay; i++) {
+
+        const cell = document.createElement("div");
+
+        cell.className = "cal-cell empty";
+
+        grid.appendChild(cell);
+
+    }
+
+
+    for (let day = 1; day <= daysInMonth; day++) {
+
+        const cell = document.createElement("div");
+
+        cell.className = "cal-cell";
+
+        cell.textContent = day;
+
+
+        const isoDate = `${fwdCalYear}-${String(fwdCalMonth+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+
+        if (isoDate === selectedVal) cell.classList.add("selected");
+
+        if (day === today.getDate() && fwdCalMonth === today.getMonth() && fwdCalYear === today.getFullYear())
+
+            cell.classList.add("today");
+
+
+        cell.addEventListener("click", () => {
+
+            document.getElementById("fwd_startDate").value = isoDate;
+
+            fwdCloseCal();
+
+        });
+
+
+        grid.appendChild(cell);
+
+    }
+
+}
+
+
+// ── CLICK-OUTSIDE: CLOSE BOTH CALENDARS ──────────────────────────────────────
+
+document.addEventListener("click", function(e) {
+
+    const invWrapper = document.getElementById("invCalWrapper");
+
+    if (invWrapper && !invWrapper.contains(e.target)) closeCal();
+
+
+    const fwdWrapper = document.getElementById("fwdCalWrapper");
+
+    if (fwdWrapper && !fwdWrapper.contains(e.target)) fwdCloseCal();
+
+});
+
+
+// ── EXCEL GENERATION ──────────────────────────────────────────────────────────
+
+function v(id) { return (document.getElementById(id) || {}).value || ""; }
+
+
+function generateExcel() {
+
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+
+
+    // ── Inverse timing values ──
+
+    const startTime    = v("startTime");
+
+    const tzSelect     = document.getElementById("timezone");
+
+    const tzLabel      = tzSelect.options[tzSelect.selectedIndex].text;
+
+    const cetRaw       = document.getElementById("cetDisplay").textContent.replace("→ ", "").trim();
+
+
+    const destTime     = v("destTime");
+
+    const destTzSelect = document.getElementById("destTimezone");
+
+    const destTzLabel  = destTzSelect.options[destTzSelect.selectedIndex].text;
+
+    const destCetRaw   = document.getElementById("destCetDisplay").textContent.replace("→ ", "").trim();
+
+
+    const durationEl  = document.getElementById("durationDisplay");
+
+    const durationVal = durationEl.classList.contains("duration-error")
+
+        ? "" : durationEl.textContent.replace("→ ", "").trim();
+
+
+    // ── Forward timing values ──
+
+    const fwdStartTime    = v("fwd_startTime");
+
+    const fwdTzSelect     = document.getElementById("fwd_timezone");
+
+    const fwdTzLabel      = fwdTzSelect.options[fwdTzSelect.selectedIndex].text;
+
+    const fwdCetRaw       = document.getElementById("fwd_cetDisplay").textContent.replace("→ ", "").trim();
+
+
+    const fwdDestTime     = v("fwd_destTime");
+
+    const fwdDestTzSelect = document.getElementById("fwd_destTimezone");
+
+    const fwdDestTzLabel  = fwdDestTzSelect.options[fwdDestTzSelect.selectedIndex].text;
+
+    const fwdDestCetRaw   = document.getElementById("fwd_destCetDisplay").textContent.replace("→ ", "").trim();
+
+
+    const fwdDurationEl  = document.getElementById("fwd_durationDisplay");
+
+    const fwdDurationVal = fwdDurationEl.classList.contains("duration-error")
+
+        ? "" : fwdDurationEl.textContent.replace("→ ", "").trim();
+
+
+    // ── Common rows (always written) ──
+
+    const commonRows = [
+
+        ["Parameter", "Value"],
+
+        ["Study Name",  v("studyName")],
+
+        ["Mode",        mode],
+
+    ];
+
+
+    // ── Inverse-only rows ──
+
+    const inverseRows = [
+
+        // Mission Timing
+        ["optim", document.querySelector('input[name="optimMode"]:checked').value],
+        
+        ["Start Date",                                  v("startDate")],
+
+        ["Start Time",                                  startTime],
+
+        ["Timezone",                                    tzLabel],
+
+        ["Start Time (CET)",                            cetRaw],
+
+        ["Destination Date",                            v("destDate")],
+
+        ["Destination Reached Time",                    destTime],
+
+        ["Destination Reached Time Timezone",           destTzLabel],
+
+        ["Destination Reached Time (CET)",              destCetRaw],
+
+        ["Mission Duration",                            durationVal],
+
+        // Flight Conditions
+
+        ["Cruise Altitude (m)",                         v("cruiseAltitude")],
+
+        ["Ceiling Tolerance",                           v("ceilingTolerance")],
+
+        ["Loiter Coefficient",                          v("loiterCoefficient")],
+
+        ["Global Timestep (min)",                       v("globalTimestep")],
+
+        // Envelope
+
+        ["Envelope Thickness (m)",                      v("invEnvelopeThickness")],
+
+        ["Envelope Mass per m² (kg/m²)",                v("invEnvelopeMassPerM2")],
+
+        // Gas
+
+        ["Gas Type",                                    resolvedInvGasLabel()],
+
+        ["Gas Density (kg/m³)",                         resolvedInvGasDensity()],
+
+        // Ballonet
+
+        ["Ballonet Max Volume Fraction",                v("ballonetMaxVolumeFraction")],
+
+        ["Ballonet Thickness (m)",                      v("invBallonetThickness")],
+
+        ["Ballonet Mass per m² (kg/m²)",                v("invBallonetMassPerM2")],
+
+        // Solar Panels
+
+        ["Solar Panel Area per Panel (m²)",             v("inv_solarPanelAreaPerPanel")],
+
+        ["Solar Panel Weight per Panel (kg)",           v("inv_solarPanelWeight")],
+
+        // Energy System
+
+        ["Energy Capacity per Battery (J)",            v("invEnergyCapacityPerBattery")],
+
+        ["Battery Weight per Unit Volume (kg/m³)",      v("inv_batteryWeightVolume")],
+
+        ["Battery Length (m)",                          v("inv_battL")],
+
+        ["Battery Breadth (m)",                         v("inv_battB")],
+
+        ["Battery Height (m)",                          v("inv_battH")],
+
+        ["Solar Panel Efficiency",                      v("solarPanelEfficiency")],
+
+        ["Motor Efficiency",                            v("motorEfficiency")],
+
+        // Payload
+
+        ["Payload Weight (kg)",                         v("inv_payload")],
+
+        ["Payload D Factor",                            v("inv_payloadDFactor")],
+
+        ["Payload Length (m)",                          v("inv_dimL")],
+
+        ["Payload Breadth (m)",                         v("inv_dimB")],
+
+        ["Payload Height (m)",                          v("inv_dimH")],
+
+        // Load-Patch
+
+        ["Load-Patch Radius (m)",                       v("invLoadPatchRadius")],
+
+        ["Load-Patch Location (0–1)",                   v("invLoadPatchLocation")],
+
+        ["Load-Patch Thickness (m)",                    v("invLoadPatchThickness")],
+
+        ["Load-Patch Weight per Unit Volume (kg/m³)",   v("invLoadPatchWeightVolume")],
+
+    ];
+
+
+    // ── Forward-only rows ──
+
+    const forwardRows = [
+
+        // Mission Timing
+
+        ["Start Date",                                  v("fwd_startDate")],
+
+        ["Start Time",                                  fwdStartTime],
+
+        ["Timezone",                                    fwdTzLabel],
+
+        ["Start Time (CET)",                            fwdCetRaw],
+
+        ["Destination Date",                            v("fwd_destDate")],
+
+        ["Destination Reached Time",                    fwdDestTime],
+
+        ["Destination Reached Time Timezone",           fwdDestTzLabel],
+
+        ["Destination Reached Time (CET)",              fwdDestCetRaw],
+
+        ["Mission Duration",                            fwdDurationVal],
+
+        // Flight Conditions
+
+        ["Cruise Altitude (m)",                         v("fwd_cruiseAltitude")],
+
+        // Geometry & Envelope
+
+        ["Outer Envelope Radius (m)",                   v("radius")],
+
+        ["Envelope Thickness (m)",                      v("thickness")],
+
+        ["Envelope Mass per m² (kg/m²)",                v("envelopeMassPerM2")],
+
+        // Gas
+
+        ["Gas Type",                                    resolvedGasLabel()],
+
+        ["Gas Density (kg/m³)",                         resolvedGasDensity()],
+
+        ["Gas Mass (kg)",                               v("gasMass")],
+
+        // Ballonet
+
+        ["Ballonet Radius (m)",                         v("ballRadius")],
+
+        ["Ballonet Thickness (m)",                      v("ballThickness")],
+
+        ["Ballonet Mass per m² (kg/m²)",                v("ballMassPerM2")],
+
+        // Solar Panels
+
+        ["Required Solar Panel Area (m²)",              v("requiredSolarPanelArea")],
+
+        ["Solar Panel Area per Panel (m²)",             v("solarPanelAreaPerPanel")],
+
+        ["Solar Panel Weight per Panel (kg)",           v("solarPanelWeight")],
+
+        // Battery
+
+        ["Number of Batteries",                         v("numBatteries")],
+
+        ["Energy Capacity per Battery (J)",            v("energyCapacityPerBattery")],
+
+        ["Battery Weight per Unit Volume (kg/m³)",      v("batteryWeightVolume")],
+
+        ["Battery Length (m)",                          v("battL")],
+
+        ["Battery Breadth (m)",                         v("battB")],
+
+        ["Battery Height (m)",                          v("battH")],
+
+        // Propulsion – Vertical
+
+        ["Vertical Propeller Radius (m)",               v("vertPropRadius")],
+
+        ["No. of Blades — Vertical",                    v("vertBlades")],
+
+        ["Vertical Propulsor Location (0–1)",           v("vertPropLoc")],
+
+        ["Vertical Strut Size (m)",                     v("vertStrutSize")],
+
+        ["Vertical Strut Radius (m)",                   v("vertStrutRadius")],
+
+        ["Vertical Prop Weight (kg)",                   v("vertPropWeight")],
+
+        // Propulsion – Horizontal
+
+        ["Horizontal Propeller Radius (m)",             v("horizPropRadius")],
+
+        ["No. of Blades — Horizontal",                  v("horizBlades")],
+
+        ["Horizontal Propulsor Location (0–1)",         v("horizPropLoc")],
+
+        ["Horizontal Strut Size (m)",                   v("horizStrutSize")],
+
+        ["Horizontal Strut Radius (m)",                 v("horizStrutRadius")],
+
+        ["Horizontal Prop Weight (kg)",                 v("horiPropWeight")],
+
+        // Payload
+
+        ["Payload Weight (kg)",                         v("payload")],
+
+        ["Payload D Factor",                            v("payloadDFactor")],
+
+        ["Payload Length (m)",                          v("dimL")],
+
+        ["Payload Breadth (m)",                         v("dimB")],
+
+        ["Payload Height (m)",                          v("dimH")],
+
+        // Load-Patch
+
+        ["Load-Patch Radius (m)",                       v("loadPatchRadius")],
+
+        ["Load-Patch Location (0–1)",                   v("loadPatchLocation")],
+
+        ["Load-Patch Thickness (m)",                    v("loadPatchThickness")],
+
+        ["Load-Patch Weight per Unit Volume (kg/m³)",   v("loadPatchWeightVolume")],
+
+    ];
+
+
+    const rows = commonRows.concat(mode === "inverse" ? inverseRows : forwardRows);
+
+
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+
+    const colAWidth = Math.max(...rows.map(r => String(r[0]).length));
+
+    const colBWidth = Math.max(...rows.map(r => String(r[1]).length));
+
+    worksheet["!cols"] = [{ wch: colAWidth + 2 }, { wch: colBWidth + 2 }];
+
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "KBE_Input");
+
+
+    const fileName = v("studyName") || "KBE_output";
+
+    XLSX.writeFile(workbook, fileName + ".xlsx");
+
+}
+
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+
+window.onload = function() {
+
+    updateMode();
+
+    initCal();
+
+    fwdInitCal();
+
+};
+
+</script>
+
+
+</body>
+
+</html>
